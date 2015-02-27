@@ -1,0 +1,32 @@
+{
+  "name": "timer",
+  "repository": "git@github.com:uniphil/timer.git",
+  "version": "0.0.1",
+  "description": "track time",
+  "author": "uniphil",
+  "devDependencies": {
+    "watchify": "^2.4.0"
+  },
+  "dependencies": {
+    "object-assign": "^2.0.0",
+    "q": "^1.2.0",
+    "react": "^0.12.2",
+    "react-router": "^0.12.0",
+    "reactify": "^1.0.0",
+    "reflux": "^0.2.5",
+    "results": "0.0.2"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "reactify",
+        {
+          "es6": true
+        }
+      ]
+    ]
+  },
+  "scripts": {
+    "watch": "watchify js/app.js -do app.js"
+  }
+}

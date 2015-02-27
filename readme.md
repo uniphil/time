@@ -1,0 +1,3 @@
+time
+
+npm run watch
