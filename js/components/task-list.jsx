@@ -18,7 +18,7 @@ var TaskList = React.createClass({
     return (
       <ul>
         { this.state.tasks.map((task) =>
-          <li key={task.id}><Task {...task} /></li>
+          <li key={task.id}><Task {...task} asForm={task.editing} /></li>
         )}
       </ul>
     );

@@ -4,43 +4,38 @@ var actions = require('../actions');
 
 var Task = React.createClass({
 
-  getInitialState() {
-    return {
-      editing: false
-    };
-  },
-
   edit(e) {
     e && e.preventDefault();
-    this.setState({
-      editing: true
-    });
+    actions.beginEditTask(this.props.id);
   },
 
   commit(e) {
     e && e.preventDefault();
-    var timeEl = this.refs.time.getDOMNode(),
-        descEl = this.refs.description.getDOMNode();
+    var durEl = this.refs.dur.getDOMNode(),
+        projEl = this.refs.project.getDOMNode();
+        sumEl = this.refs.summary.getDOMNode();
+        tagsEl = this.refs.tags.getDOMNode();
 
     var task = {
-      id: this.props.id,
-      time: timeEl.value.trim(),
-      description: descEl.value.trim()
+      duration: parseInt(durEl.value.trim(), 10),
+      project: projEl.value.trim(),
+      summary: sumEl.value.trim(),
+      tags: tagsEl.value.trim().split(', '),
     };
 
-    actions.updateTask(this.props.id, task);
-    // TODO: handle async stuff
-
-    this.setState({
-      editing: false
-    });
+    if (this.props.formMode === 'edit') {
+      task.id = this.props.id;
+      task.timestamp = this.props.timestamp;
+      actions.updateTask(this.props.id, task);
+    } else {
+      task.timestamp = (new Date()).getTime();  // timestamp
+      actions.logTask(task);
+    }
   },
 
   cancel(e) {
     e && e.preventDefault();
-    this.setState({
-      editing: false
-    });
+    actions.cancelEditTask(this.props.id);
   },
 
   remove(e) {
@@ -51,27 +46,45 @@ var Task = React.createClass({
   renderDisplay() {
     return (
       <span>
-        <strong>{this.props.time}</strong>
-        <span> {this.props.description}</span>
+        <strong>{this.props.duration}</strong>
+        <span> {this.props.project}</span>
+        <span> {this.props.summary}</span>
+        <span> {this.props.tags}</span>
         <button onClick={this.edit}>e</button>
-        <button onClick={this.remove}>&times;</button>
+        <button onClick={this.remove} alt="delete">&times;</button>
       </span>
     );
   },
 
-  renderEditing() {
+  renderForm() {
+    var editMode = this.props.formMode !== 'create';
     return (
       <form onSubmit={this.commit}>
-        <input type="text" defaultValue={this.props.time} ref="time" />
-        <input type="text" defaultValue={this.props.description} ref="description" />
+        <label>
+          Time spent
+          <input type="number" defaultValue={this.props.dur || 0} ref="dur" />
+        </label>
+        <label>
+          Project
+          <input type="text" defaultValue={this.props.project || 'personal'} ref="project" />
+        </label>
+        <label>
+          Task Summary
+          <input type="text" defaultValue={this.props.summary} ref="summary" />
+        </label>
+        <label>
+          Tags
+          <input type="text" defaultValue={this.props.tags} ref="tags" />
+        </label>
         <button type="submit">save</button>
-        <button onClick={this.cancel}>cancel</button>
+        {editMode && <button onClick={this.cancel}>cancel</button>}
+        {editMode && <button onClick={this.remove} alt="delete">&times;</button>}
       </form>
     );
   },
 
   render() {
-    return this.state.editing ? this.renderEditing() : this.renderDisplay();
+    return this.props.asForm ? this.renderForm() : this.renderDisplay();
   }
 });
 

@@ -1,13 +1,13 @@
 var React = require('react');
 var {RouteHandler} = require('react-router');
-var AddTask = require('./add-task.jsx');
+var Task = require('./task.jsx');
 
 
 var Root = React.createClass({
   render() {
     return (
       <div>
-        <AddTask />
+        <Task asForm={true} formMode="create" />
         <RouteHandler {...this.props} />
       </div>
     );
