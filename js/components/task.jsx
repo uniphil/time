@@ -6,7 +6,7 @@ var Task = React.createClass({
 
   edit(e) {
     e && e.preventDefault();
-    actions.beginEditTask(this.props.id);
+    actions.task.beginEdit(this.props.id);
   },
 
   commit(e) {
@@ -23,24 +23,24 @@ var Task = React.createClass({
       tags: tagsEl.value.trim().split(', '),
     };
 
-    if (this.props.formMode === 'edit') {
+    if (this.props.formMode !== 'create') {
       task.id = this.props.id;
       task.timestamp = this.props.timestamp;
-      actions.updateTask(this.props.id, task);
+      actions.task.update(this.props.id, task);
     } else {
       task.timestamp = (new Date()).getTime();  // timestamp
-      actions.logTask(task);
+      actions.task.log(task);
     }
   },
 
   cancel(e) {
     e && e.preventDefault();
-    actions.cancelEditTask(this.props.id);
+    actions.task.cancelEdit(this.props.id);
   },
 
   remove(e) {
     e && e.preventDefault();
-    actions.removeTask(this.props.id);
+    actions.task.remove(this.props.id);
   },
 
   renderDisplay() {

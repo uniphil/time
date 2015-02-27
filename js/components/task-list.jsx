@@ -11,7 +11,7 @@ var TaskList = React.createClass({
   mixins: [Reflux.connect(stores.tasks, 'tasks')],
 
   componentWillMount() {
-    actions.loadTasks();
+    actions.task.loadAll();
   },
 
   render() {

@@ -10,38 +10,38 @@ var clientId = +(new Date());
 
 var tasks = Reflux.createStore({
 
-  listenables: actions,
+  listenables: actions.task,
 
-  onLogTask(task) {
+  onLog(task) {
     task.id = clientId++;  // aah... this is mutating the main task woo js
     crud.create(this.data, task)(this.crudResult());
   },
 
-  onLogTaskFailedValidation(task, errors) {
+  onLogFailedValidation(task, errors) {
     console.warn('task failed validation :(', task, errors);
   },
 
-  onBeginEditTask(taskId) {
+  onBeginEdit(taskId) {
     var task = crud.get(this.data, taskId).expect(c.NOT_FOUND);  // throws if no task
     var editingTask = assign({}, task, {editing: true});
     crud.update(this.data, taskId, editingTask)(this.crudResult());
   },
 
-  onCancelEditTask(taskId) {
+  onCancelEdit(taskId) {
     var task = crud.get(this.data, taskId).expect(c.NOT_FOUND);  // throws if no task
     var editingTask = assign({}, task, {editing: false});
     crud.update(this.data, taskId, editingTask)(this.crudResult());
   },
 
-  onUpdateTask(taskId, task) {
+  onUpdate(taskId, task) {
     crud.update(this.data, taskId, task)(this.crudResult());
   },
 
-  onRemoveTask(taskId) {
+  onRemove(taskId) {
     crud.del(this.data, taskId)(this.crudResult());
   },
 
-  onLoadTasksCompleted(tasks) {
+  onLoadAllCompleted(tasks) {
     this.setData(tasks.map((task) => assign({}, task, {
       editing: false
     })));
@@ -70,5 +70,5 @@ var tasks = Reflux.createStore({
 
 
 module.exports = {
-  tasks: tasks
+  tasks: tasks,
 };

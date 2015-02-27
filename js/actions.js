@@ -3,43 +3,35 @@ var api = require('./api');
 var validate = require('./validate');
 
 
-var logTask = Reflux.createAction({
+var task = {};
+
+task.log = Reflux.createAction({
   children: ['failedValidation'],
   asyncResult: true,
 });
-logTask.listenAndPromise(api.log);
-logTask.shouldEmit = (task) => {
+task.log.listenAndPromise(api.log);
+task.log.shouldEmit = (task) => {
   if (validate.task(task)) {
     return true;
   } else {
-    logTask.failedValidation(task, validate.errors);
+    task.log.failedValidation(task, validate.errors);
     return false;
   }
 };
 
+task.beginEdit = Reflux.createAction();
+task.cancelEdit = Reflux.createAction();
 
-var beginEditTask = Reflux.createAction();
-var cancelEditTask = Reflux.createAction();
+task.update = Reflux.createAction({asyncResult: true});
+task.update.listenAndPromise(api.update);
 
+task.remove = Reflux.createAction({asyncResult: true});
+task.remove.listenAndPromise(api.remove);
 
-var updateTask = Reflux.createAction({asyncResult: true});
-updateTask.listenAndPromise(api.update);
-
-
-var removeTask = Reflux.createAction({asyncResult: true});
-removeTask.listenAndPromise(api.remove);
-
-
-var loadTasks = Reflux.createAction({asyncResult: true});
-loadTasks.listenAndPromise(api.load);
+task.loadAll = Reflux.createAction({asyncResult: true});
+task.loadAll.listenAndPromise(api.load);
 
 
 module.exports = {
-  logTask: logTask,
-  beginEditTask: beginEditTask,
-  cancelEditTask: cancelEditTask,
-  updateTask: updateTask,
-  removeTask: removeTask,
-  loadTasks: loadTasks
+  task: task
 };
-
