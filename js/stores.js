@@ -8,7 +8,7 @@ var actions = require('./actions');
 
 function crudResult(crudStore) {
   return {
-    Ok: (tasks) => crudStore.setData(tasks),
+    Ok: (things) => crudStore.setData(things),
     Err: (err) => console.error('store error:', err),
   };
 }
@@ -41,7 +41,26 @@ var crudMethods = {
   },
 
   onCreate(thing) {
-    crud.create(this.getData(), thing)(crudResult(this));
+    tmpThing = assign({}, thing, {
+      id: thing.clientId,
+      pending: true,
+    });
+    crud.create(this.getData(), tmpThing)(crudResult(this));
+  },
+
+  onCreateFailedValidation(thing, errors) {
+    console.warn('thing failed validation :(', thing, errors);
+  },
+
+  onCreateCompleted([savedThing, clientId]) {
+    crud.del(this.getData(), clientId)
+      .andThen((things) => crud.create(things, savedThing))
+      .andThen((things) => this.setData(things))
+      .unwrap();  // throws if err
+  },
+
+  onCreateFailed([err, clientId]) {
+    console.error('Failed to create time log', err);
   },
 
   onBeginEdit(id) {
@@ -64,6 +83,10 @@ var crudMethods = {
     crud.del(this.getData(), id)(crudResult(this));
   },
 
+  get(id) {
+    return crud.get(this.getData(), id);
+  },
+
 };
 
 
@@ -71,44 +94,21 @@ var tasks = Reflux.createStore({
 
   mixins: [crudMethods],
 
-  listenables: actions.task,
+  listenables: actions.tasks,
 
-  onLog(task) {
-    tmpTask = assign({}, task, {
-      id: task.clientId,
-      pending: true,
-    });
-    crud.create(this.getData(), tmpTask)(crudResult(this));
-  },
-
-  onLogFailedValidation(task, errors) {
-    console.warn('task failed validation :(', task, errors);
-  },
-
-  onLogCompleted([savedTask, clientId]) {
-    crud.del(this.getData(), clientId)
-      .andThen((tasks) => crud.create(tasks, savedTask))
-      .andThen((tasks) => this.setData(tasks))
-      .unwrap();  // throws if err
-  },
-
-  onLogFailed([err, clientId]) {
-    console.error('Failed to create time log', err);
-  },
-
-  onLoadAll() {
+  onLoad() {
     this.data.status = Err(c.LOADING);
     this.emit();
   },
 
-  onLoadAllCompleted(tasks) {
+  onLoadCompleted(tasks) {
     this.data.status = Ok(c.LOADED);
     this.setData(tasks.map((task) => assign({}, task, {
       editing: false
     })));
   },
 
-  onLoadAllFailed(err) {
+  onLoadFailed(err) {
     this.data.status = Err(c.LOAD_FAILED);
     this.emit();
   },

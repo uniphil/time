@@ -28,12 +28,34 @@ var task = validator({
         type: 'string'
       },
       uniqueItems: true,
-    }
+    },
   },
   required: [ 'timestamp', 'duration', 'summary', 'tags' ],
 });
 
 
+var project = validator({
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+    },
+    name: {
+      type: 'string',
+    },
+    tags: {
+      type: 'array',
+      items: {
+        type: 'string'
+      },
+      uniqueItems: true,
+    },
+  },
+  required: [ 'name' ],
+});
+
+
 module.exports = {
   task: task,
+  project: project,
 };

@@ -9,7 +9,7 @@ var apiId = +new Date() / 2;
 
 function fakeDelay(fn, altTime) {
   var d = Q.defer();
-  window.setTimeout(() => fn(d), altTime || 200);
+  window.setTimeout(() => fn(d), altTime || 400);
   return d.promise;
 }
 
@@ -36,39 +36,43 @@ function crudResult(d, key) {
   };
 }
 
-function localCrud(operation, key) {
+function localCR(key) {
+  return (newThing) => {
+    var clientId = newThing.clientId,
+        thing = assign({}, newThing, {id: '' + apiId++});
+    delete thing.clientId;
+    return fakeDelay((d) => crud.create(get(key), thing)({
+      Ok: (updatedThings) => {
+        set(key, updatedThings);
+        d.resolve([thing, clientId]);
+      },
+      Err: (err) => {
+        d.reject([err, clientId]);
+      },
+    }));
+  };
+}
+
+function localUD(operation, key) {
   return (/* arguments */) => {
     var args = [get(key)].concat(Array.prototype.slice.apply(arguments));
     return fakeDelay((d) => crud[operation].apply(null, args)(crudResult(d, key)));
   };
 }
 
-var logTask = (newTask) => {
-  var clientId = newTask.clientId;
-  task = assign({}, newTask, {id: '' + apiId++});
-  delete task.clientId;
-  return fakeDelay((d) => crud.create(get('tasks'), task)({
-    Ok: (updatedTasks) => {
-      set('tasks', updatedTasks);
-      d.resolve([task, clientId]);
-    },
-    Err: (err) => {
-      d.reject([err, clientId]);
-    },
-  }));
-};
-var updateTask = localCrud('update', 'tasks');
-var removeTask = localCrud('del', 'tasks');
+var createTask = localCR('tasks');
+var updateTask = localUD('update', 'tasks');
+var removeTask = localUD('del', 'tasks');
 var loadTasks = () => fakeDelay((d) => d.resolve(get('tasks')), 0);
 
-var createProject = localCrud('create', 'projects');
-var updateProject = localCrud('update', 'projects');
-var removeProject = localCrud('del', 'projects');
+var createProject = localCR('projects');
+var updateProject = localUD('update', 'projects');
+var removeProject = localUD('del', 'projects');
 var loadProjects = () => fakeDelay((d) => d.resolve(get('projects')));
 
 
 module.exports = {
-  logTask: logTask,
+  createTask: createTask,
   updateTask: updateTask,
   removeTask: removeTask,
   loadTasks: loadTasks,

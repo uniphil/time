@@ -13,20 +13,19 @@ var TaskDetail = React.createClass({
   mixins: [Reflux.connect(stores.tasks)],
 
   componentWillMount() {
-    actions.task.loadAll();
-  },
-
-  getTask() {
-    var id = this.props.params.taskId;
-    var task = this.state.ls.filter((task) => task.id === id)[0];
-    return task? Some(task) : None();
+    actions.tasks.load();
   },
 
   render() {
     return this.state.status({
       Ok: () => {
-        return this.getTask()({
-          Some: (task) => <Task {...task} />,
+        return stores.tasks.get(this.props.params.taskId)({
+          Some: (task) => (
+            <div>
+              <Task {...task} />
+              <Link to="home">home</Link>
+            </div>
+          ),
           None: () => <p>could not find that task :( <Link to="home">home</Link></p>,
         });
       },

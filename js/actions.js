@@ -7,34 +7,42 @@ var validate = require('./validate');
 var clientId = +new Date();
 
 
-var task = {};
+Reflux.ActionMethods = assign(Reflux.ActionMethods || {}, {
+  validateWith(validator) {
+    this.failedValidation = Reflux.createAction();
+    this.shouldEmit = (payload) => {
+      if (validator(payload)) {
+        return true;
+      } else {
+        this.failedValidation(payload, validator.errors);
+        return false;
+      }
+    };
+  }
+});
 
-task.log = Reflux.createAction({
+
+var tasks = {};
+
+tasks.create = Reflux.createAction({
   children: ['failedValidation'],
   asyncResult: true,
   preEmit: (task) => [assign({}, task, {clientId: 'c' + clientId++})],
-  shouldEmit: (task) => {
-    if (validate.task(task)) {
-      return true;
-    } else {
-      task.log.failedValidation(task, validate.errors);
-      return false;
-    }
-  },
 });
-task.log.listenAndPromise(api.logTask);
+tasks.create.validateWith(validate.task);
+tasks.create.listenAndPromise(api.createTask);
 
-task.beginEdit = Reflux.createAction();
-task.cancelEdit = Reflux.createAction();
+tasks.beginEdit = Reflux.createAction();
+tasks.cancelEdit = Reflux.createAction();
 
-task.update = Reflux.createAction({asyncResult: true});
-task.update.listenAndPromise(api.updateTask);
+tasks.update = Reflux.createAction({asyncResult: true});
+tasks.update.listenAndPromise(api.updateTask);
 
-task.remove = Reflux.createAction({asyncResult: true});
-task.remove.listenAndPromise(api.removeTask);
+tasks.remove = Reflux.createAction({asyncResult: true});
+tasks.remove.listenAndPromise(api.removeTask);
 
-task.loadAll = Reflux.createAction({asyncResult: true});
-task.loadAll.listenAndPromise(api.loadTasks);
+tasks.load = Reflux.createAction({asyncResult: true});
+tasks.load.listenAndPromise(api.loadTasks);
 
 
 var projects = {};
@@ -43,15 +51,7 @@ projects.create = Reflux.createAction({
   children: ['failedValidation'],
   asyncResult: true,
 });
-projects.create.listenAndPromise(api.createProject);
-projects.create.shouldEmit = (project) => {
-  if (validate.project(project)) {
-    return true;
-  } else {
-    projects.create.failedValidation(project, validate.errors);
-    return false;
-  }
-};
+projects.create.validateWith(validate.project);
 
 projects.beginEdit = Reflux.createAction();
 projects.cancelEdit = Reflux.createAction();
@@ -67,6 +67,6 @@ projects.load.listenAndPromise(api.loadProjects);
 
 
 module.exports = {
-  task: task,
+  tasks: tasks,
   projects: projects,
 };
