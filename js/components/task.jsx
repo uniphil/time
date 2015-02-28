@@ -2,6 +2,21 @@ var React = require('react');
 var {Link} = require('react-router');
 var actions = require('../actions');
 
+
+var TagSet = React.createClass({
+  render() {
+    var tags = this.props.tags;
+    return <span>{tags.map((tag, i) => {
+      if (i !== tags.length-1) {
+        return <span key={tag}><Link to="tag" params={{tag: tag}}>{tag}</Link>, </span>;
+      } else {
+        return <Link key={tag} to="tag" params={{tag: tag}}>{tag}</Link>;
+      }
+    })}</span>;
+  },
+});
+
+
 var Task = React.createClass({
 
   edit(e) {
@@ -20,7 +35,7 @@ var Task = React.createClass({
       duration: parseInt(durEl.value.trim(), 10),
       project: projEl.value.trim(),
       summary: sumEl.value.trim(),
-      tags: tagsEl.value.trim().split(', '),
+      tags: ((t) => t && t.split(', ') || [])(tagsEl.value.trim()),
     };
 
     if (this.props.formMode !== 'create') {
@@ -48,9 +63,13 @@ var Task = React.createClass({
     return (
       <span style={{background: this.props.pending ? '#ff9' : 'transparent'}}>
         <strong>{this.props.duration}</strong> mins
-        <span> <Link to="project" params={{project: this.props.project}}>{this.props.project}</Link></span>
-        <span> <Link to="task" params={{taskId: this.props.id}}>{this.props.summary}</Link></span>
-        <span> {this.props.tags}</span>
+        {' '}
+        <Link to="project" params={{project: this.props.project}}>{this.props.project}</Link>
+        {' '}
+        <Link to="task" params={{taskId: this.props.id}}>{this.props.summary}</Link>
+        {' '}
+        <TagSet tags={this.props.tags} />
+        {' '}
         {editable && <button onClick={this.edit}>e</button>}
         {editable && <button onClick={this.remove} alt="delete">&times;</button>}
       </span>
@@ -63,7 +82,7 @@ var Task = React.createClass({
       <form onSubmit={this.commit}>
         <label>
           Time spent
-          <input type="number" defaultValue={this.props.dur || 0} ref="dur" />
+          <input type="number" defaultValue={this.props.duration || 0} ref="dur" />
         </label>
         <label>
           Project

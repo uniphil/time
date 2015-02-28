@@ -1,9 +1,8 @@
 var React = require('react');
-
 var Task = require('./task.jsx');
 
-var TaskList = React.createClass({
 
+var TaskList = React.createClass({
   render() {
     return (
       <ul>
