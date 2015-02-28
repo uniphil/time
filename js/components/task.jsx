@@ -45,7 +45,7 @@ var Task = React.createClass({
 
   renderDisplay() {
     return (
-      <span>
+      <span style={{background: this.props.pending ? '#ff9' : 'transparent'}}>
         <strong>{this.props.duration}</strong>
         <span> {this.props.project}</span>
         <span> {this.props.summary}</span>
