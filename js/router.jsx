@@ -18,7 +18,7 @@ var routes = (
     <DefaultRoute handler={Overview} />
     <Route name="task" path="tasks/:taskId" handler={TaskDetail} />
     <Route name="projects" path="projects" handler={ProjectsOverview} />
-    <Route name="project" path="projects/:projectId" handler={ProjectDetail} />
+    <Route name="project" path="projects/:project" handler={ProjectDetail} />
   </Route>
 );
 

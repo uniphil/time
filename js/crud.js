@@ -9,6 +9,12 @@ function get(from, id) /*-> Option */ {
 }
 
 
+function getWith(from, test) /*-> Option */ {
+  var match = from.filter(test)[0];
+  return match? Some(match) : None();
+}
+
+
 function create(from, new_) /*-> Result */ {
   if (typeof new_.id === 'undefined') {
     return Err(c.MISSING_ID);
@@ -47,6 +53,7 @@ function del(from, id) /*-> Result */ {
 
 module.exports = {
   get: get,
+  getWith: getWith,
   create: create,
   update: update,
   del: del,

@@ -5,7 +5,7 @@ var actions = require('../actions');
 var Overview = React.createClass({
 
   componentWillMount() {
-    actions.projects.load();
+    actions.tasks.load();
   },
 
   render() {

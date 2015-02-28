@@ -45,28 +45,6 @@ tasks.load = Reflux.createAction({asyncResult: true});
 tasks.load.listenAndPromise(api.loadTasks);
 
 
-var projects = {};
-
-projects.create = Reflux.createAction({
-  children: ['failedValidation'],
-  asyncResult: true,
-});
-projects.create.validateWith(validate.project);
-
-projects.beginEdit = Reflux.createAction();
-projects.cancelEdit = Reflux.createAction();
-
-projects.update = Reflux.createAction({asyncResult: true});
-projects.update.listenAndPromise(api.updateProject);
-
-projects.remove = Reflux.createAction({asyncResult: true});
-projects.remove.listenAndPromise(api.removeProject);
-
-projects.load = Reflux.createAction({asyncResult: true});
-projects.load.listenAndPromise(api.loadProjects);
-
-
 module.exports = {
   tasks: tasks,
-  projects: projects,
 };

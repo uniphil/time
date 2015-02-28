@@ -104,6 +104,10 @@ var crudMethods = {
     return crud.get(this.getData(), id);
   },
 
+  getWith(test) {
+    return crud.getWith(this.getData(), test);
+  },
+
 };
 
 
@@ -113,13 +117,6 @@ var tasks = Reflux.createStore({
 });
 
 
-var projects = Reflux.createStore({
-  mixins: [crudMethods],
-  listenables: actions.projects,
-});
-
-
 module.exports = {
   tasks: tasks,
-  projects: projects,
 };

@@ -47,8 +47,8 @@ var Task = React.createClass({
     var editable = this.props.editable;
     return (
       <span style={{background: this.props.pending ? '#ff9' : 'transparent'}}>
-        <strong>{this.props.duration}</strong>
-        <span> <Link to="project" params={{projectId: this.props.project}}>{this.props.project}</Link></span>
+        <strong>{this.props.duration}</strong> mins
+        <span> <Link to="project" params={{project: this.props.project}}>{this.props.project}</Link></span>
         <span> <Link to="task" params={{taskId: this.props.id}}>{this.props.summary}</Link></span>
         <span> {this.props.tags}</span>
         {editable && <button onClick={this.edit}>e</button>}

@@ -3,6 +3,7 @@ var React = require('react');
 var Reflux = require('reflux');
 var {Link} = require('react-router');
 var stores = require('../stores');
+var actions = require('../actions');
 var c = require('../constants');
 
 var Project = require('./project.jsx');
@@ -10,20 +11,27 @@ var Project = require('./project.jsx');
 
 var ProjectDetail = React.createClass({
 
-  mixins: [Reflux.connect(stores.projects)],
+  mixins: [Reflux.connect(stores.tasks)],
+
+  componentWillMount() {
+    actions.tasks.load();
+  },
 
   render() {
     return this.state.status({
       Ok: () => {
-        return stores.projects.get(this.props.params.projectId)({
-          Some: (project) => (
+        var project = this.props.params.project;
+        var tasks = stores.tasks.getData().filter((t) => t.project === project);
+        if (tasks.length === 0) {
+          return <p>could not find that project :( <Link to="home">home</Link></p>;
+        } else {
+          return (
             <div>
-              <Project {...project} />
-              <Link to="home">home</Link>
+              <Project name={project} tasks={tasks} />
+              <p><Link to="home">home</Link></p>
             </div>
-          ),
-          None: () => <p>could not find that project :( <Link to="home">home</Link></p>,
-        });
+          );
+        }
       },
       Err: (why) => {
         if (why === c.NOT_LOADED) {

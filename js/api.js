@@ -65,19 +65,10 @@ var updateTask = localUD('update', 'tasks');
 var removeTask = localUD('del', 'tasks');
 var loadTasks = () => fakeDelay((d) => d.resolve(get('tasks')), 0);
 
-var createProject = localCR('projects');
-var updateProject = localUD('update', 'projects');
-var removeProject = localUD('del', 'projects');
-var loadProjects = () => fakeDelay((d) => d.resolve(get('projects')));
-
 
 module.exports = {
   createTask: createTask,
   updateTask: updateTask,
   removeTask: removeTask,
   loadTasks: loadTasks,
-  createProject: createProject,
-  updateProject: updateProject,
-  removeProject: removeProject,
-  loadProjects: loadProjects,
 };
