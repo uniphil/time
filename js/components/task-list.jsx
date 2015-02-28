@@ -8,7 +8,7 @@ var stores = require('../stores');
 
 var TaskList = React.createClass({
 
-  mixins: [Reflux.connect(stores.tasks, 'tasks')],
+  mixins: [Reflux.connect(stores.tasks)],
 
   componentWillMount() {
     actions.task.loadAll();
@@ -17,8 +17,13 @@ var TaskList = React.createClass({
   render() {
     return (
       <ul>
-        { this.state.tasks.map((task) =>
-          <li key={task.id}><Task {...task} asForm={task.editing} /></li>
+        { this.state.ls.map((task) =>
+          <li key={task.id}>
+            <Task
+              {...task}
+              asForm={task.editing}
+              editable={this.props.editable} />
+          </li>
         )}
       </ul>
     );

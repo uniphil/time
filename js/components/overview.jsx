@@ -5,7 +5,7 @@ var TaskList = require('./task-list.jsx');
 var Overview = React.createClass({
   render() {
     return (
-      <TaskList />
+      <TaskList editable={true} />
     );
   }
 });

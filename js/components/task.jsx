@@ -1,6 +1,6 @@
 var React = require('react');
+var {Link} = require('react-router');
 var actions = require('../actions');
-
 
 var Task = React.createClass({
 
@@ -44,14 +44,15 @@ var Task = React.createClass({
   },
 
   renderDisplay() {
+    var editable = this.props.editable;
     return (
       <span style={{background: this.props.pending ? '#ff9' : 'transparent'}}>
         <strong>{this.props.duration}</strong>
-        <span> {this.props.project}</span>
-        <span> {this.props.summary}</span>
+        <span> <Link to="project" params={{projectId: this.props.project}}>{this.props.project}</Link></span>
+        <span> <Link to="task" params={{taskId: this.props.id}}>{this.props.summary}</Link></span>
         <span> {this.props.tags}</span>
-        <button onClick={this.edit}>e</button>
-        <button onClick={this.remove} alt="delete">&times;</button>
+        {editable && <button onClick={this.edit}>e</button>}
+        {editable && <button onClick={this.remove} alt="delete">&times;</button>}
       </span>
     );
   },

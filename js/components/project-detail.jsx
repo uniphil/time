@@ -1,22 +1,26 @@
 var React = require('react');
-var TaskList = require('./task-list.jsx');
+var Reflux = require('reflux');
+var stores = require('../stores');
 
 
 var Overview = React.createClass({
 
-  componentWillMount() {
+  mixins: [Reflux.connectFilter(stores.projects, function(projects) {
+    return projects.filter((p) => p.id === this.props.params.projectId)[0];
+  })],
 
+  componentWillMount() {
+    this.props.params.projectId;
   },
 
-  componentWillReceiveProps() {
-    console.log('rp');
+  componentWillReceiveProps(newProps) {
+    newProps.params.projectId;
   },
 
   render() {
     return (
       <div>
-        'proj'
-        <TaskList />
+        <h3>hello</h3>
       </div>
     );
   }

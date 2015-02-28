@@ -1,5 +1,5 @@
 var assign = require('object-assign');
-var {Ok} = require('results');
+var {Ok, Err} = require('results');
 var Reflux = require('reflux');
 var crud = require('./crud');
 var c = require('./constants');
@@ -20,37 +20,48 @@ var crudMethods = {
   },
 
   getInitialState() {
-    return [];
+    return {
+      ls: [],
+      status: Err(c.NOT_LOADED),
+    };
+  },
+
+  getData: function() {
+    return this.data.ls;
   },
 
   setData: function(newData) {
-    this.data = newData;
-    this.trigger(this.data);
+    this.data.ls = newData;
+    this.emit();
     return Ok(c.OK);
   },
 
+  emit: function() {
+    this.trigger(this.data);
+  },
+
   onCreate(thing) {
-    crud.create(this.data, thing)(crudResult(this));
+    crud.create(this.getData(), thing)(crudResult(this));
   },
 
   onBeginEdit(id) {
-    var thing = crud.get(this.data, id).expect(c.NOT_FOUND);  // throws if no thing
+    var thing = crud.get(this.getData(), id).expect(c.NOT_FOUND);  // throws if no thing
     var editingThing = assign({}, thing, {editing: true});
-    crud.update(this.data, id, editingThing)(crudResult(this));
+    crud.update(this.getData(), id, editingThing)(crudResult(this));
   },
 
   onCancelEdit(id) {
-    var thing = crud.get(this.data, id).expect(c.NOT_FOUND);  // throws if no thing
+    var thing = crud.get(this.getData(), id).expect(c.NOT_FOUND);  // throws if no thing
     var editingThing = assign({}, thing, {editing: false});
-    crud.update(this.data, id, editingThing)(crudResult(this));
+    crud.update(this.getData(), id, editingThing)(crudResult(this));
   },
 
   onUpdate(id, thing) {
-    crud.update(this.data, id, thing)(crudResult(this));
+    crud.update(this.getData(), id, thing)(crudResult(this));
   },
 
   onRemove(id) {
-    crud.del(this.data, id)(crudResult(this));
+    crud.del(this.getData(), id)(crudResult(this));
   },
 
 };
@@ -67,7 +78,7 @@ var tasks = Reflux.createStore({
       id: task.clientId,
       pending: true,
     });
-    crud.create(this.data, tmpTask)(crudResult(this));
+    crud.create(this.getData(), tmpTask)(crudResult(this));
   },
 
   onLogFailedValidation(task, errors) {
@@ -75,7 +86,7 @@ var tasks = Reflux.createStore({
   },
 
   onLogCompleted([savedTask, clientId]) {
-    crud.del(this.data, clientId)
+    crud.del(this.getData(), clientId)
       .andThen((tasks) => crud.create(tasks, savedTask))
       .andThen((tasks) => this.setData(tasks))
       .unwrap();  // throws if err
@@ -85,10 +96,26 @@ var tasks = Reflux.createStore({
     console.error('Failed to create time log', err);
   },
 
+  onLoadAll() {
+    this.data.status = Err(c.LOADING);
+    this.emit();
+  },
+
   onLoadAllCompleted(tasks) {
+    this.data.status = Ok(c.LOADED);
     this.setData(tasks.map((task) => assign({}, task, {
       editing: false
     })));
+  },
+
+  onLoadAllFailed(err) {
+    this.data.status = Err(c.LOAD_FAILED);
+    this.emit();
+  },
+
+  get(taskId) {
+    return crud.get(this.getData(), taskId)
+      .okOr(this.data.status);  // loading or load_failed
   },
 });
 
