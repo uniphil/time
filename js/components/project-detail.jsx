@@ -1,4 +1,3 @@
-var {Some, None} = require('results');
 var React = require('react');
 var Reflux = require('reflux');
 var {Link} = require('react-router');
@@ -27,7 +26,7 @@ var ProjectDetail = React.createClass({
         } else {
           return (
             <div>
-              <Project name={project} tasks={tasks} />
+              <Project name={project} tasks={tasks} list={true} />
               <p><Link to="home">home</Link></p>
             </div>
           );

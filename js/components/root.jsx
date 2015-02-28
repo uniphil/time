@@ -1,5 +1,5 @@
 var React = require('react');
-var {RouteHandler} = require('react-router');
+var {Link, RouteHandler} = require('react-router');
 var Task = require('./task.jsx');
 
 

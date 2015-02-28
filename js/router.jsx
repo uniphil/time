@@ -9,7 +9,7 @@ var {Route, DefaultRoute} = Router;
 var Root = require('./components/root.jsx');
 var Overview = require('./components/overview.jsx');
 var TaskDetail = require('./components/task-detail.jsx');
-var ProjectsOverview = require('./components/projects-overview.jsx');
+var ProjectsList = require('./components/projects-overview.jsx');
 var ProjectDetail = require('./components/project-detail.jsx');
 
 
@@ -17,7 +17,7 @@ var routes = (
   <Route name="home" path="/" handler={Root}>
     <DefaultRoute handler={Overview} />
     <Route name="task" path="tasks/:taskId" handler={TaskDetail} />
-    <Route name="projects" path="projects" handler={ProjectsOverview} />
+    <Route name="projects" path="projects/" handler={ProjectsList} />
     <Route name="project" path="projects/:project" handler={ProjectDetail} />
   </Route>
 );
