@@ -83,19 +83,6 @@ var crudMethods = {
     crud.del(this.getData(), id)(crudResult(this));
   },
 
-  get(id) {
-    return crud.get(this.getData(), id);
-  },
-
-};
-
-
-var tasks = Reflux.createStore({
-
-  mixins: [crudMethods],
-
-  listenables: actions.tasks,
-
   onLoad() {
     this.data.status = Err(c.LOADING);
     this.emit();
@@ -113,19 +100,22 @@ var tasks = Reflux.createStore({
     this.emit();
   },
 
-  get(taskId) {
-    return crud.get(this.getData(), taskId)
-      .okOr(this.data.status);  // loading or load_failed
+  get(id) {
+    return crud.get(this.getData(), id);
   },
+
+};
+
+
+var tasks = Reflux.createStore({
+  mixins: [crudMethods],
+  listenables: actions.tasks,
 });
 
 
 var projects = Reflux.createStore({
-
   mixins: [crudMethods],
-
   listenables: actions.projects,
-
 });
 
 
