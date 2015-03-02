@@ -5,14 +5,38 @@ var actions = require('../actions');
 
 var TagSet = React.createClass({
   render() {
-    var tags = this.props.tags;
-    return <span>{tags.map((tag, i) => {
-      if (i !== tags.length-1) {
-        return <span key={tag}><Link to="tag" params={{tag: tag}}>{tag}</Link>, </span>;
-      } else {
-        return <Link key={tag} to="tag" params={{tag: tag}}>{tag}</Link>;
-      }
-    })}</span>;
+    var tags = this.props.tags,
+        style = {
+          tag: {
+            display: 'inline-block',
+            padding: '0 5px',
+            fontSize: '0.8em',
+            borderRadius: '5px',
+            color: 'hsl(280, 60%, 95%)',
+            textDecoration: 'none',
+            background: 'hsl(280, 60%, 60%)',
+          },
+          sep: {
+            display: 'inline-block',
+            color: 'transparent',
+            width: '4px',
+          }
+        }
+    return (
+      <span>
+        {tags.map((tag, i) => (
+          <span key={tag}>
+            <Link
+              style={style.tag}
+              to="tag"
+              params={{tag: tag}}>
+              {tag}
+            </Link>
+            {i < tags.length-1 ? <span style={style.sep}>, </span> : ''}
+          </span>
+        ))}
+      </span>
+    );
   },
 });
 
@@ -35,7 +59,7 @@ var Task = React.createClass({
       duration: parseInt(durEl.value.trim(), 10),
       project: projEl.value.trim(),
       summary: sumEl.value.trim(),
-      tags: ((t) => t && t.split(', ') || [])(tagsEl.value.trim()),
+      tags: ((t) => t && t.split(',').map((t) => t.trim()) || [])(tagsEl.value.trim()),
     };
 
     if (this.props.formMode !== 'create') {
