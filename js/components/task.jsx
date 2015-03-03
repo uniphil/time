@@ -1,38 +1,28 @@
+var assign = require('object-assign');
 var React = require('react');
 var {Link} = require('react-router');
 var actions = require('../actions');
+var s = require('../styles');
 
 
 var TagSet = React.createClass({
+  getInitialState() { return {}; },
   render() {
-    var tags = this.props.tags,
-        style = {
-          tag: {
-            display: 'inline-block',
-            padding: '0 5px',
-            fontSize: '0.8em',
-            borderRadius: '5px',
-            color: 'hsl(280, 60%, 95%)',
-            textDecoration: 'none',
-            background: 'hsl(280, 60%, 60%)',
-          },
-          sep: {
-            display: 'inline-block',
-            color: 'transparent',
-            width: '4px',
-          }
-        }
+    var tags = this.props.tags;
+
     return (
       <span>
         {tags.map((tag, i) => (
           <span key={tag}>
             <Link
-              style={style.tag}
+              onMouseOver={() => this.setState({hover: tag})}
+              onMouseOut={() => this.setState({hover: false})}
+              style={s.button('tag', this.state.hover === tag ? 'inverse' : null)}
               to="tag"
               params={{tag: tag}}>
               {tag}
             </Link>
-            {i < tags.length-1 ? <span style={style.sep}>, </span> : ''}
+            {i < tags.length-1 ? <span style={s.space}>, </span> : ''}
           </span>
         ))}
       </span>
@@ -42,6 +32,10 @@ var TagSet = React.createClass({
 
 
 var Task = React.createClass({
+
+  getInitialState() {
+    return {};
+  },
 
   edit(e) {
     e && e.preventDefault();
@@ -99,14 +93,29 @@ var Task = React.createClass({
     );
     var stuff = [
       <span><strong>{this.props.duration}</strong> mins</span>,
-      <Link to="project" params={{project: this.props.project}}>{this.props.project}</Link>,
+      <Link
+        to="project"
+        onMouseOver={() => this.setState({hover: 'project'})}
+        onMouseOut={() => this.setState({hover: null})}
+        style={s.button('tag', this.state.hover !== 'project' && 'inverse')}
+        params={{project: this.props.project}}>{this.props.project}</Link>,
       this.props.summary,
       <TagSet tags={this.props.tags} />,
     ];
     if (this.props.editable) {
       stuff.push(
-        <button onClick={this.edit}>e</button>,
-        <button onClick={this.remove} alt="delete">&times;</button>
+        <button
+          onClick={this.edit}
+          onMouseOver={() => this.setState({hover: 'edit'})}
+          onMouseOut={() => this.setState({hover: null})}
+          style={s.button('bare', this.state.hover === 'edit' && 'inverse')}
+          alt="edit">e</button>,
+        <button
+          onClick={this.remove}
+          onMouseOver={() => this.setState({hover: 'delete'})}
+          onMouseOut={() => this.setState({hover: null})}
+          style={s.button('caution', 'bare', this.state.hover === 'delete' && 'inverse')}
+          alt="delete">&times;</button>
       )
     }
     return (this.props.asTR? wrapTr : wrapLine)(
@@ -137,7 +146,7 @@ var Task = React.createClass({
         </label>
         <button type="submit">save</button>
         {editMode && <button onClick={this.cancel}>cancel</button>}
-        {editMode && <button onClick={this.remove} alt="delete">&times;</button>}
+        {editMode && <button onClick={this.remove} style={s.button('caution')} alt="delete">&times;</button>}
       </form>
     );
   },

@@ -8,6 +8,7 @@
     "watchify": "^2.4.0"
   },
   "dependencies": {
+    "husl": "^5.0.2",
     "is-my-json-valid": "^2.9.4",
     "object-assign": "^2.0.0",
     "q": "^1.2.0",

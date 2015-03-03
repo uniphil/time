@@ -5,7 +5,7 @@ var stores = require('../stores');
 var actions = require('../actions');
 var c = require('../constants');
 
-var Task = require('./task.jsx');
+var Header = require('./header.jsx');
 
 
 var Root = React.createClass({
@@ -19,7 +19,7 @@ var Root = React.createClass({
   render() {
     return (
       <div>
-        <Task asForm={true} formMode="create" />
+        <Header />
         {this.state.status({
           Ok: () => <RouteHandler {...this.props} tasks={this.state.ls} />,
           Err: (why) => {
