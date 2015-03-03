@@ -83,20 +83,35 @@ var Task = React.createClass({
   },
 
   renderDisplay() {
-    var editable = this.props.editable;
-    return (
-      <span style={{background: this.props.pending ? '#ff9' : 'transparent'}}>
-        <strong>{this.props.duration}</strong> mins
-        {' '}
-        <Link to="project" params={{project: this.props.project}}>{this.props.project}</Link>
-        {' '}
-        <Link to="task" params={{taskId: this.props.id}}>{this.props.summary}</Link>
-        {' '}
-        <TagSet tags={this.props.tags} />
-        {' '}
-        {editable && <button onClick={this.edit}>e</button>}
-        {editable && <button onClick={this.remove} alt="delete">&times;</button>}
+    wrapLine = (rowProps, stuff) => (
+      <span {...rowProps}>
+        {stuff.map((astuff, i) =>
+          <span key={i}>{astuff}{i < stuff.length-1? ' ' : ''}</span>
+        )}
       </span>
+    );
+    wrapTr = (rowProps, stuff) => (
+      <tr {...rowProps}>
+        {stuff.map((astuff, i) =>
+          <td key={i}>{astuff}</td>
+        )}
+      </tr>
+    );
+    var stuff = [
+      <span><strong>{this.props.duration}</strong> mins</span>,
+      <Link to="project" params={{project: this.props.project}}>{this.props.project}</Link>,
+      this.props.summary,
+      <TagSet tags={this.props.tags} />,
+    ];
+    if (this.props.editable) {
+      stuff.push(
+        <button onClick={this.edit}>e</button>,
+        <button onClick={this.remove} alt="delete">&times;</button>
+      )
+    }
+    return (this.props.asTR? wrapTr : wrapLine)(
+      {style:{background: this.props.pending ? '#ff9' : 'transparent'}},
+      stuff
     );
   },
 

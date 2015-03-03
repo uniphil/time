@@ -7,7 +7,7 @@ var Overview = React.createClass({
   render() {
     return (
       <div>
-        <TaskList tasks={this.props.tasks} editable={true} />
+        <TaskList tasks={this.props.tasks} editable={true} asTable={true} />
         <p>
           <Link to="projects">projects</Link>{' '}
           <Link to="tags">tags</Link>
