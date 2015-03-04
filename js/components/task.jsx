@@ -24,18 +24,6 @@ var TagSet = React.createClass({
 });
 
 
-var LabeledInput = React.createClass({
-  render() {
-    return (
-      <div className={'task-form-input-container ' + (this.props.containerClass || '')}>
-        <label htmlFor={this._rootNodeID + '-input'}>{this.props.label}</label>
-        <input id={this._rootNodeID + '-input'} {...this.props} />
-      </div>
-    );
-  }
-});
-
-
 var Task = React.createClass({
 
   edit(e) {
@@ -107,6 +95,15 @@ var Task = React.createClass({
     );
   },
 
+  labeledInput(key, label, props) {
+    return (
+      <div className={'task-form-input-container task-' + key + ' task-form-' + key}>
+        <label htmlFor={this._rootNodeID + '-' + key}>{label}</label>
+        <input id={this._rootNodeID + '-' + key} {...props} />
+      </div>
+    );
+  },
+
   renderForm() {
     var editMode = this.props.formMode !== 'create',
         id = (name) => this._rootNodeID + name;
@@ -114,30 +111,22 @@ var Task = React.createClass({
       <form
         className={'task task-form task-form-' + (editMode? 'edit' : 'create')}
         onSubmit={this.commit}>
-        <LabeledInput
-          containerClass="task-duration task-form-duration"
-          label="Time"
-          type="number"
-          defaultValue={this.props.duration || 10}
-          ref="dur" />
-        <LabeledInput
-          containerClass="task-project task-form-project"
-          label="Project"
-          type="text"
-          defaultValue={this.props.project || 'personal'}
-          ref="project" />
-        <LabeledInput
-          containerClass="task-summary task-form-summary"
-          label="Summary"
-          type="text"
-          defaultValue={this.props.summary}
-          ref="summary" />
-        <LabeledInput
-          containerClass="task-tags task-form-tags"
-          label="Tags"
-          type="text"
-          defaultValue={this.props.tags}
-          ref="tags" />
+        {this.labeledInput('duration', 'Time', {
+          type: 'number',
+          defaultValue: this.props.duration || 10,
+          ref: 'dur'})}
+        {this.labeledInput('project', 'Project', {
+          type: 'text',
+          defaultValue: this.props.project || 'personal',
+          ref: 'project'})}
+        {this.labeledInput('summary', 'Summary', {
+          type: 'text',
+          defaultValue: this.props.summary,
+          ref: 'summary'})}
+        {this.labeledInput('tags', 'Tags', {
+          type: 'text',
+          defaultValue: this.props.tags,
+          ref: 'tags'})}
         <div className="task-edit-buttons task-form-edit-buttons">
           <button
             type="submit"
