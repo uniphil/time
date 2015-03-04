@@ -2,11 +2,9 @@ var assign = require('object-assign');
 var React = require('react');
 var {Link} = require('react-router');
 var actions = require('../actions');
-var s = require('../styles');
 
 
 var TagSet = React.createClass({
-  getInitialState() { return {}; },
   render() {
     var tags = this.props.tags;
 
@@ -14,15 +12,10 @@ var TagSet = React.createClass({
       <span>
         {tags.map((tag, i) => (
           <span key={tag}>
-            <Link
-              onMouseOver={() => this.setState({hover: tag})}
-              onMouseOut={() => this.setState({hover: false})}
-              style={s.button('tag', this.state.hover === tag ? 'inverse' : null)}
-              to="tag"
-              params={{tag: tag}}>
+            <Link className="button accent" to="tag" params={{tag: tag}}>
               {tag}
             </Link>
-            {i < tags.length-1 ? <span style={s.space}>, </span> : ''}
+            {i < tags.length-1 ? <span className="hide-sep">, </span> : ''}
           </span>
         ))}
       </span>
@@ -31,11 +24,19 @@ var TagSet = React.createClass({
 });
 
 
-var Task = React.createClass({
+var LabeledInput = React.createClass({
+  render() {
+    return (
+      <div className={'task-form-input-container ' + (this.props.containerClass || '')}>
+        <label htmlFor={this._rootNodeID + '-input'}>{this.props.label}</label>
+        <input id={this._rootNodeID + '-input'} {...this.props} />
+      </div>
+    );
+  }
+});
 
-  getInitialState() {
-    return {};
-  },
+
+var Task = React.createClass({
 
   edit(e) {
     e && e.preventDefault();
@@ -77,76 +78,76 @@ var Task = React.createClass({
   },
 
   renderDisplay() {
-    wrapLine = (rowProps, stuff) => (
-      <span {...rowProps}>
-        {stuff.map((astuff, i) =>
-          <span key={i}>{astuff}{i < stuff.length-1? ' ' : ''}</span>
+    var editing = this.props.editable;
+    return (
+      <div className="task" onDoubleClick={this.edit}>
+        <div className="task-duration">
+          <span className="task-duration-value">{this.props.duration}</span> mins
+        </div>
+        <div className="task-project">
+          <Link className="button accent inverse" to="project" params={{project: this.props.project}}>
+            {this.props.project}
+          </Link>
+        </div>
+        <div className="task-summary">
+          {this.props.summary}
+        </div>
+        <TagSet tags={this.props.tags} />
+        {editing && (
+          <div className="task-edit-buttons">
+            <button className="button bare" onClick={this.edit} title="edit">
+              /
+            </button>
+            <button className="button bare caution" onClick={this.remove} title="delete">
+              &times;
+            </button>
+          </div>
         )}
-      </span>
-    );
-    wrapTr = (rowProps, stuff) => (
-      <tr {...rowProps}>
-        {stuff.map((astuff, i) =>
-          <td key={i}>{astuff}</td>
-        )}
-      </tr>
-    );
-    var stuff = [
-      <span><strong>{this.props.duration}</strong> mins</span>,
-      <Link
-        to="project"
-        onMouseOver={() => this.setState({hover: 'project'})}
-        onMouseOut={() => this.setState({hover: null})}
-        style={s.button('tag', this.state.hover !== 'project' && 'inverse')}
-        params={{project: this.props.project}}>{this.props.project}</Link>,
-      this.props.summary,
-      <TagSet tags={this.props.tags} />,
-    ];
-    if (this.props.editable) {
-      stuff.push(
-        <button
-          onClick={this.edit}
-          onMouseOver={() => this.setState({hover: 'edit'})}
-          onMouseOut={() => this.setState({hover: null})}
-          style={s.button('bare', this.state.hover === 'edit' && 'inverse')}
-          alt="edit">e</button>,
-        <button
-          onClick={this.remove}
-          onMouseOver={() => this.setState({hover: 'delete'})}
-          onMouseOut={() => this.setState({hover: null})}
-          style={s.button('caution', 'bare', this.state.hover === 'delete' && 'inverse')}
-          alt="delete">&times;</button>
-      )
-    }
-    return (this.props.asTR? wrapTr : wrapLine)(
-      {style:{background: this.props.pending ? '#ff9' : 'transparent'}},
-      stuff
+      </div>
     );
   },
 
   renderForm() {
-    var editMode = this.props.formMode !== 'create';
+    var editMode = this.props.formMode !== 'create',
+        id = (name) => this._rootNodeID + name;
     return (
-      <form onSubmit={this.commit}>
-        <label>
-          Time spent
-          <input type="number" defaultValue={this.props.duration || 0} ref="dur" />
-        </label>
-        <label>
-          Project
-          <input type="text" defaultValue={this.props.project || 'personal'} ref="project" />
-        </label>
-        <label>
-          Task Summary
-          <input type="text" defaultValue={this.props.summary} ref="summary" />
-        </label>
-        <label>
-          Tags
-          <input type="text" defaultValue={this.props.tags} ref="tags" />
-        </label>
-        <button type="submit">save</button>
-        {editMode && <button onClick={this.cancel}>cancel</button>}
-        {editMode && <button onClick={this.remove} style={s.button('caution')} alt="delete">&times;</button>}
+      <form
+        className={'task task-form task-form-' + (editMode? 'edit' : 'create')}
+        onSubmit={this.commit}>
+        <LabeledInput
+          containerClass="task-duration task-form-duration"
+          label="Time"
+          type="number"
+          defaultValue={this.props.duration || 10}
+          ref="dur" />
+        <LabeledInput
+          containerClass="task-project task-form-project"
+          label="Project"
+          type="text"
+          defaultValue={this.props.project || 'personal'}
+          ref="project" />
+        <LabeledInput
+          containerClass="task-summary task-form-summary"
+          label="Summary"
+          type="text"
+          defaultValue={this.props.summary}
+          ref="summary" />
+        <LabeledInput
+          containerClass="task-tags task-form-tags"
+          label="Tags"
+          type="text"
+          defaultValue={this.props.tags}
+          ref="tags" />
+        <div className="task-edit-buttons task-form-edit-buttons">
+          <button
+            type="submit"
+            className="button inverse woo"
+            title="save">save</button>
+          {editMode && <button
+            onClick={this.cancel}
+            className="button"
+            title="cancel">&times;</button>}
+        </div>
       </form>
     );
   },

@@ -1,6 +1,9 @@
 var React = require('react');
 var {Link} = require('react-router');
-var ProjectList = require('./project-list.jsx');
+var TaskList = require('./task-list.jsx');
+
+
+var projectAlias = (task) => [task.project];
 
 
 var ProjectOverview = React.createClass({
@@ -8,7 +11,7 @@ var ProjectOverview = React.createClass({
     return (
       <div>
         <h3>Projects</h3>
-        <ProjectList tasks={this.props.tasks} />
+        <TaskList tasks={this.props.tasks} aggregate={projectAlias} />
         <p><Link to="home">home</Link></p>
       </div>
     );

@@ -4,12 +4,13 @@ var Task = require('./task.jsx');
 
 var Header = React.createClass({
   render() {
+    var project = this.props.tasks[0] && this.props.tasks[0].project;
     return (
-      <div style={{
-        padding: '1em',
-        background: 'hsl(280, 60%, 95%)',
-      }}>
-        <Task asForm={true} formMode="create" />
+      <div className="header">
+        <Task
+          asForm={true}
+          project={project}
+          formMode="create" />
       </div>
     );
   },

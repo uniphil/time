@@ -18,8 +18,8 @@ var Root = React.createClass({
 
   render() {
     return (
-      <div>
-        <Header />
+      <div className="app">
+        <Header tasks={this.state.ls} />
         {this.state.status({
           Ok: () => <RouteHandler {...this.props} tasks={this.state.ls} />,
           Err: (why) => {

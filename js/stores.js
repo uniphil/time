@@ -114,6 +114,9 @@ var crudMethods = {
 var tasks = Reflux.createStore({
   mixins: [crudMethods],
   listenables: actions.tasks,
+  emit() {
+    this.trigger(assign({}, this.data, {ls: this.data.ls.slice().reverse()}));
+  },
 });
 
 

@@ -1,14 +1,17 @@
 var React = require('react');
 var {Link} = require('react-router');
-var TagsList = require('./tag-list.jsx');
+var TaskList = require('./task-list.jsx');
 
 
-var ProjectOverview = React.createClass({
+var tagsAlias = (task) => task.tags;
+
+
+var TagsOverview = React.createClass({
   render() {
     return (
       <div>
         <h3>Tags</h3>
-        <TagsList tasks={this.props.tasks} />
+        <TaskList tasks={this.props.tasks} aggregate={tagsAlias} />
         <p><Link to="home">home</Link></p>
       </div>
     );
@@ -16,4 +19,4 @@ var ProjectOverview = React.createClass({
 });
 
 
-module.exports = ProjectOverview;
+module.exports = TagsOverview;

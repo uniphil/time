@@ -1,0 +1,126 @@
+html {
+  font-family: sans-serif;
+}
+
+.app {
+  max-width: 51em;
+  margin: 0 auto;
+}
+
+.header {
+  background: hsl(280, 50%, 90%);
+}
+
+.task {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.5em 0.5em 0.5em 1em;
+}
+.task-duration {
+  width: 6em;
+}
+.task-duration-value {
+  font-weight: bold;
+}
+.task-project {
+  width: 8em;
+}
+.task-summary {
+  flex: 1 1 auto;
+}
+.task-form label {
+  display: block;
+}
+.task-form input {
+  width: calc(100% - 1em);
+}
+.task-form-edit label {
+  display: none;
+}
+.task-form-edit-buttons {
+  align-self: flex-end;
+  white-space: nowrap;
+}
+
+.task-list,
+.task-list-item {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.task-list-item {
+  margin: 0.5em 0;
+  background: hsl(0, 0%, 95%);
+}
+
+
+/* attribute-oriented */
+
+.button {
+  margin: 0;
+  padding: 0.1em 0.3em;
+  font: inherit;
+  text-decoration: none;
+  color: hsl(0, 0%, 50%);
+  border: 1px solid hsl(0, 0%, 50%);
+  border-radius: 0.3em;
+  background: transparent;
+  cursor: pointer;
+}
+.button.inverse,
+.button:hover {
+  color: hsl(0, 0%, 100%);
+  background: hsl(0, 0%, 50%);
+}
+.button.accent {
+  border-color: hsl(280, 50%, 50%);
+}
+.button.accent.inverse,
+.button.accent:hover {
+  background: hsl(280, 50%, 50%);
+}
+.button.woo {
+  border-color: hsl(160, 50%, 50%);
+}
+.button.woo.inverse,
+.button.woo:hover {
+  background: hsl(160, 50%, 50%);
+}
+.button.caution {
+  border-color: hsl(350, 60%, 50%);
+}
+.button.caution.inverse,
+.button.caution:hover {
+  background: hsl(350, 60%, 50%);
+}
+.button.bare {
+  border: none;
+}
+
+
+.accent {
+  color: hsl(280, 50%, 50%);
+}
+.woo {
+  color: hsl(160, 50%, 50%);
+}
+.caution {
+  color: hsl(350, 60%, 50%);
+}
+
+
+/* transform */
+.hide-sep {
+  display: inline-block;
+  width: 0.3em;
+  color: transparent;
+}
+
+
+/* typo */
+
+h3 small {
+  font-weight: normal;
+}
