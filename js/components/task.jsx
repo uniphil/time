@@ -1,4 +1,6 @@
 var assign = require('object-assign');
+var murmur = require('murmurhash-js/murmurhash3_gc');
+var husl = require('husl');
 var React = require('react');
 var {Link} = require('react-router');
 var actions = require('../actions');
@@ -25,6 +27,10 @@ var TagSet = React.createClass({
 
 
 var Task = React.createClass({
+
+  getInitialState() {
+    return {hue: 180}
+  },
 
   edit(e) {
     e && e.preventDefault();
@@ -65,15 +71,29 @@ var Task = React.createClass({
     actions.tasks.remove(this.props.id);
   },
 
+  typeProject(e) {
+    var projInput = this.refs.project.getDOMNode();
+    this.setState({hue: murmur(projInput.value) % 360});
+  },
+
   renderDisplay() {
     var editing = this.props.editable;
     return (
-      <div className="task" onDoubleClick={this.edit}>
+      <div
+        className="task"
+        style={{
+          color: husl.toHex(this.props.hue, 67, 7),
+          backgroundColor: husl.toHex(this.props.hue, 67, 95)}}
+        onDoubleClick={this.edit}>
         <div className="task-duration">
           <span className="task-duration-value">{this.props.duration}</span> mins
         </div>
         <div className="task-project">
-          <Link className="button accent inverse" to="project" params={{project: this.props.project}}>
+          <Link
+            className="button accent inverse bare"
+            style={{backgroundColor: husl.toHex(this.props.hue, 67, 58)}}
+            to="project"
+            params={{project: this.props.project}}>
             {this.props.project}
           </Link>
         </div>
@@ -110,6 +130,7 @@ var Task = React.createClass({
     return (
       <form
         className={'task task-form task-form-' + (editMode? 'edit' : 'create')}
+        style={{backgroundColor: husl.toHex(this.state.hue, 67, 95)}}
         onSubmit={this.commit}>
         {this.labeledInput('duration', 'Time', {
           type: 'number',
@@ -118,6 +139,15 @@ var Task = React.createClass({
         {this.labeledInput('project', 'Project', {
           type: 'text',
           defaultValue: this.props.project || 'personal',
+          onKeyUp: this.typeProject,
+          className: 'button inverse',
+          style: {
+            color: 'white',
+            backgroundColor: husl.toHex(this.state.hue, 67, 58),
+            borderColor: husl.toHex(this.state.hue, 67, 48),
+            outline: 'none',
+            cursor: 'text',
+          },
           ref: 'project'})}
         {this.labeledInput('summary', 'Summary', {
           type: 'text',

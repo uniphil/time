@@ -1,4 +1,5 @@
 var assign = require('object-assign');
+var murmur = require('murmurhash-js/murmurhash3_gc');
 var {Ok, Err} = require('results');
 var Reflux = require('reflux');
 var crud = require('./crud');
@@ -115,7 +116,11 @@ var tasks = Reflux.createStore({
   mixins: [crudMethods],
   listenables: actions.tasks,
   emit() {
-    this.trigger(assign({}, this.data, {ls: this.data.ls.slice().reverse()}));
+    // process data for display
+    var tasks = this.data.ls.map((task) => assign({}, task, {
+      hue: murmur(task.project) % 360,
+    }));
+    this.trigger(assign({}, this.data, {ls: tasks}));
   },
 });
 

@@ -25,7 +25,7 @@ function create(from, new_) /*-> Result */ {
     return Err(c.EXISTS);
   }
   var withNew = from.concat([newThing]);
-  withNew.sort((a, b) => a.timestamp - b.timestamp);
+  withNew.sort((a, b) => b.timestamp - a.timestamp);
   return Ok(withNew);
 }
 
