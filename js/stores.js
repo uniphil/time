@@ -8,7 +8,7 @@ var actions = require('./actions');
 
 function crudResult(crudStore) {
   return {
-    Ok: (things) => crudStore.setData(things),
+    Ok: (stuff) => crudStore.setData(stuff),
     Err: (err) => console.error('store error:', err),
   };
 }

@@ -16,14 +16,16 @@ function getWith(from, test) /*-> Option */ {
 
 
 function create(from, new_) /*-> Result */ {
-  if (typeof new_.id === 'undefined') {
+  var newThing = assign({}, new_);
+  if (typeof newThing.id === 'undefined') {
     return Err(c.MISSING_ID);
   }
-  var existing = from.filter((t) => t.id === new_.id)[0];
+  var existing = from.filter((t) => t.id === newThing.id)[0];
   if (existing) {
     return Err(c.EXISTS);
   }
-  var withNew = from.concat([new_]);
+  var withNew = from.concat([newThing]);
+  withNew.sort((a, b) => a.timestamp - b.timestamp);
   return Ok(withNew);
 }
 
