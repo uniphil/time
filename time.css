@@ -21,6 +21,9 @@ html {
 .task-duration {
   width: 6em;
 }
+.task-deleted .task-duration {
+  text-decoration: line-through;
+}
 .task-duration-value {
   font-weight: bold;
 }

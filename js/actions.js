@@ -45,6 +45,26 @@ tasks.load = Reflux.createAction({asyncResult: true});
 tasks.load.listenAndPromise(api.loadTasks);
 
 
+var taskBackups = {};
+
+taskBackups.create = Reflux.createAction({
+  children: ['failedValidation'],
+  asyncResult: true,
+  preEmit: (task) => [assign({}, task, {clientId: 'c' + clientId++})],
+});
+taskBackups.create.validateWith(validate.task);
+taskBackups.create.listenAndPromise(api.saveBackup);
+
+taskBackups.restore = Reflux.createAction();
+
+taskBackups.remove = Reflux.createAction({asyncResult: true});
+taskBackups.remove.listenAndPromise(api.reallyDelete);
+
+taskBackups.load = Reflux.createAction({asyncResult: true});
+taskBackups.load.listenAndPromise(api.loadBackups);
+
+
 module.exports = {
   tasks: tasks,
+  taskBackups: taskBackups,
 };

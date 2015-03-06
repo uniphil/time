@@ -65,10 +65,17 @@ var updateTask = localUD('update', 'tasks');
 var removeTask = localUD('del', 'tasks');
 var loadTasks = () => fakeDelay((d) => d.resolve(get('tasks')), 0);
 
+var saveBackup = localCR('backups');
+var reallyDelete = localUD('del', 'backups');
+var loadBackups = () => fakeDelay((d) => d.resolve(get('backups')), 0);
+
 
 module.exports = {
   createTask: createTask,
   updateTask: updateTask,
   removeTask: removeTask,
   loadTasks: loadTasks,
+  saveBackup: saveBackup,
+  loadBackups: loadBackups,
+  reallyDelete: reallyDelete,
 };

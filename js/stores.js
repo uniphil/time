@@ -115,6 +115,13 @@ var crudMethods = {
 var tasks = Reflux.createStore({
   mixins: [crudMethods],
   listenables: actions.tasks,
+  onRemove(id) {
+    this.get(id).andThen((task) => {
+      actions.taskBackups.create.triggerPromise(task)
+        .then(crudMethods.onRemove.call(this, id))
+        .catch((err) => console.error('creating backup failed, not deleting', err));
+    });
+  },
   emit() {
     // process data for display
     var tasks = this.data.ls.map((task) => assign({}, task, {
@@ -125,6 +132,25 @@ var tasks = Reflux.createStore({
 });
 
 
+var backups = Reflux.createStore({
+  mixins: [crudMethods],
+  listenables: actions.taskBackups,
+  onRestore(id) {
+    this.get(id).andThen((task) => {
+      actions.tasks.create.triggerPromise(task)
+        .then(actions.taskBackups.remove(id))
+        .catch((err) => console.error('restoring task failed', err));
+    });
+  },
+  emit() {
+    // process data for display
+    var tasks = this.data.ls.map((task) => assign({}, task, {hue: 350}));
+    this.trigger(assign({}, this.data, {ls: tasks}));
+  },
+});
+
+
 module.exports = {
   tasks: tasks,
+  backups: backups,
 };

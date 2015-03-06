@@ -71,20 +71,26 @@ var Task = React.createClass({
     actions.tasks.remove(this.props.id);
   },
 
+  restore(e) {
+    e && e.preventDefault();
+    actions.taskBackups.restore(this.props.id);
+  },
+
   typeProject(e) {
     var projInput = this.refs.project.getDOMNode();
     this.setState({hue: murmur(projInput.value) % 360});
   },
 
   renderDisplay() {
-    var editing = this.props.editable;
+    var editing = this.props.editable,
+        deleted = this.props.deleted;
     return (
       <div
-        className="task"
+        className={'task' + (deleted ? ' task-deleted' : '')}
         style={{
           color: husl.toHex(this.props.hue, 67, 7),
           backgroundColor: husl.toHex(this.props.hue, 67, 95)}}
-        onDoubleClick={this.edit}>
+        onDoubleClick={editing ? this.edit : null}>
         <div className="task-duration">
           <span className="task-duration-value">{this.props.duration}</span> mins
         </div>
@@ -108,6 +114,13 @@ var Task = React.createClass({
             </button>
             <button className="button bare caution" onClick={this.remove} title="delete">
               &times;
+            </button>
+          </div>
+        )}
+        {deleted && (
+          <div className="task-edit-buttons">
+            <button className="button woo" onClick={this.restore} title="restore">
+              restore
             </button>
           </div>
         )}
