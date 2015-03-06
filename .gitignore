@@ -1,0 +1,5 @@
+js/
+.jshintrc
+node_modules/
+package.json
+readme.md
