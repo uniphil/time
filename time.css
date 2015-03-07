@@ -2,6 +2,10 @@ html {
   font-family: sans-serif;
 }
 
+body {
+  margin: 0;
+}
+
 .app {
   max-width: 51em;
   margin: 0 auto;
@@ -9,6 +13,16 @@ html {
 
 .header {
   background: hsl(280, 50%, 90%);
+}
+
+.footer {
+  font-size: 0.8em;
+  margin-top: 3em;
+  padding: 0.5em;
+  text-align: center;
+  color: hsl(0, 0%, 40%);
+  fill: hsl(0, 0%, 40%);
+  background: hsl(0, 0%, 90%);
 }
 
 .task {
@@ -67,6 +81,7 @@ html {
   font: inherit;
   text-decoration: none;
   color: hsl(0, 0%, 50%);
+  fill: hsl(0, 0%, 50%);
   border: 1px solid hsl(0, 0%, 50%);
   border-radius: 0.3em;
   background: transparent;
@@ -75,6 +90,7 @@ html {
 .button.inverse,
 .button:hover {
   color: hsl(0, 0%, 100%);
+  fill: hsl(0, 0%, 100%);
   background: hsl(0, 0%, 50%);
 }
 .button.accent {
@@ -105,12 +121,15 @@ html {
 
 .accent {
   color: hsl(280, 50%, 50%);
+  fill: hsl(280, 50%, 50%);
 }
 .woo {
   color: hsl(160, 50%, 50%);
+  fill: hsl(160, 50%, 50%);
 }
 .caution {
   color: hsl(350, 60%, 50%);
+  fill: hsl(350, 60%, 50%);
 }
 
 
@@ -126,4 +145,11 @@ html {
 
 h3 small {
   font-weight: normal;
+}
+
+
+/* icons */
+.icon {
+  height: 1em;
+  width: 1em;
 }

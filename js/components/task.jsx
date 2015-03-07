@@ -4,6 +4,7 @@ var husl = require('husl');
 var React = require('react');
 var {Link} = require('react-router');
 var actions = require('../actions');
+var Icon = require('./icon.jsx');
 
 
 var TagSet = React.createClass({
@@ -110,7 +111,7 @@ var Task = React.createClass({
         {editing && (
           <div className="task-edit-buttons">
             <button className="button bare" onClick={this.edit} title="edit">
-              /
+              <Icon id="pencil" alt="Edit task" />
             </button>
             <button className="button bare caution" onClick={this.remove} title="delete">
               &times;

@@ -6,6 +6,7 @@ var actions = require('../actions');
 var c = require('../constants');
 
 var Header = require('./header.jsx');
+var Footer = require('./footer.jsx');
 
 
 var Root = React.createClass({
@@ -34,6 +35,7 @@ var Root = React.createClass({
             }
           },
         })}
+        <Footer />
       </div>
     );
   }
