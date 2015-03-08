@@ -30,7 +30,7 @@ var TagSet = React.createClass({
 var Task = React.createClass({
 
   getInitialState() {
-    return {hue: 180}
+    return {hue: 160}
   },
 
   edit(e) {
@@ -152,7 +152,7 @@ var Task = React.createClass({
           ref: 'dur'})}
         {this.labeledInput('project', 'Project', {
           type: 'text',
-          defaultValue: this.props.project || 'personal',
+          defaultValue: this.props.project || '',
           onKeyUp: this.typeProject,
           className: 'button inverse',
           style: {

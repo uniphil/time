@@ -12,7 +12,22 @@ body {
 }
 
 .header {
-  background: hsl(280, 50%, 90%);
+}
+.header-tools {
+  display: flex;
+  flex-direction: 'row';
+  padding: 0.5em;
+  color: hsl(0, 0%, 42%);
+  fill: hsl(0, 0%, 42%);
+}
+.header-tools h1 {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: 1em;
+  font-weight: bold;
+}
+.header-tools h1 a {
+  text-decoration: none;
 }
 
 .footer {
@@ -28,7 +43,6 @@ body {
 .task {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: baseline;
   padding: 0.5em 0.5em 0.5em 1em;
 }
