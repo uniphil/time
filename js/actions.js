@@ -25,7 +25,6 @@ Reflux.ActionMethods = assign(Reflux.ActionMethods || {}, {
 var tasks = {};
 
 tasks.create = Reflux.createAction({
-  children: ['failedValidation'],
   asyncResult: true,
   preEmit: (task) => [assign({}, task, {clientId: 'c' + clientId++})],
 });
@@ -48,7 +47,6 @@ tasks.load.listenAndPromise(api.loadTasks);
 var taskBackups = {};
 
 taskBackups.create = Reflux.createAction({
-  children: ['failedValidation'],
   asyncResult: true,
   preEmit: (task) => [assign({}, task, {clientId: 'c' + clientId++})],
 });
@@ -64,7 +62,18 @@ taskBackups.load = Reflux.createAction({asyncResult: true});
 taskBackups.load.listenAndPromise(api.loadBackups);
 
 
+var config = {};
+
+config.set = Reflux.createAction({asyncResult: true});
+config.set.validateWith(validate.config);
+config.set.listenAndPromise(api.setConfig);
+
+config.load = Reflux.createAction({asyncResult: true});
+config.load.listenAndPromise(api.loadConfig);
+
+
 module.exports = {
   tasks: tasks,
   taskBackups: taskBackups,
+  config: config,
 };

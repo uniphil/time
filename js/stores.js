@@ -7,6 +7,16 @@ var c = require('./constants');
 var actions = require('./actions');
 
 
+Reflux.StoreMethods = assign(Reflux.StoreMethods || {}, {
+  init() {
+    this.data = this.getInitialState();
+  },
+  emit() {
+    this.trigger(this.data);
+  },
+});
+
+
 function crudResult(crudStore) {
   return {
     Ok: (stuff) => crudStore.setData(stuff),
@@ -16,9 +26,6 @@ function crudResult(crudStore) {
 
 
 var crudMethods = {
-  init() {
-    this.data = this.getInitialState();
-  },
 
   getInitialState() {
     return {
@@ -34,11 +41,6 @@ var crudMethods = {
   setData: function(newData) {
     this.data.ls = newData;
     this.emit();
-    return Ok(c.OK);
-  },
-
-  emit: function() {
-    this.trigger(this.data);
   },
 
   onCreate(thing) {
@@ -125,7 +127,7 @@ var tasks = Reflux.createStore({
   emit() {
     // process data for display
     var tasks = this.data.ls.map((task) => assign({}, task, {
-      hue: murmur(task.project) % 360,
+      hue: murmur(task.project, config.data.seed) % 360,
     }));
     this.trigger(assign({}, this.data, {ls: tasks}));
   },
@@ -150,7 +152,44 @@ var backups = Reflux.createStore({
 });
 
 
+var config = Reflux.createStore({
+
+  listenables: actions.config,
+
+  init() {
+    actions.config.load();
+    this.data = this.getInitialState();
+  },
+
+  onLoadCompleted(config) {
+    this.setData(config);
+  },
+
+  onSetFailedValidation(why) {
+    console.error('validating config change failed', why);
+  },
+
+  onSetCompleted(newConfig) {
+    this.setData(newConfig);
+  },
+
+  setData(update) {
+    this.data = assign({}, this.data, update);
+    this.emit();
+  },
+
+  getInitialState() {
+    return {seed: 0};
+  },
+
+});
+
+
+tasks.listenTo(config, tasks.emit);
+
+
 module.exports = {
   tasks: tasks,
   backups: backups,
+  config: config,
 };

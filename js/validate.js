@@ -34,6 +34,19 @@ var task = validator({
 });
 
 
+var config = validator({
+  type: 'object',
+  properties: {
+    seed: {
+      description: 'seed for generating stuff like project colours',
+      type: 'integer',
+      minimum: 0,
+    },
+  },
+});
+
+
 module.exports = {
   task: task,
+  config: config,
 };

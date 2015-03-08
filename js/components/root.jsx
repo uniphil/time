@@ -11,7 +11,10 @@ var Footer = require('./footer.jsx');
 
 var Root = React.createClass({
 
-  mixins: [Reflux.connect(stores.tasks)],
+  mixins: [
+    Reflux.connect(stores.tasks, 'tasks'),
+    Reflux.connect(stores.config, 'config'),
+  ],
 
   componentWillMount() {
     actions.tasks.load();
@@ -20,9 +23,9 @@ var Root = React.createClass({
   render() {
     return (
       <div className="app">
-        <Header tasks={this.state.ls} />
-        {this.state.status({
-          Ok: () => <RouteHandler {...this.props} tasks={this.state.ls} />,
+        <Header tasks={this.state.tasks.ls} config={this.state.config} />
+        {this.state.tasks.status({
+          Ok: () => <RouteHandler {...this.props} tasks={this.state.tasks.ls} />,
           Err: (why) => {
             if (why === c.NOT_LOADED) {
               return <p>'not loaded'</p>;
