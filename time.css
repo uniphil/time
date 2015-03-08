@@ -13,20 +13,20 @@ body {
 
 .header {
 }
-.header-tools {
+.header .tools {
   display: flex;
   flex-direction: 'row';
   padding: 0.5em;
   color: hsl(0, 0%, 42%);
   fill: hsl(0, 0%, 42%);
 }
-.header-tools h1 {
+.header .tools h1 {
   flex: 1 1 auto;
   margin: 0;
   font-size: 1em;
   font-weight: bold;
 }
-.header-tools h1 a {
+.header .tools h1 a {
   text-decoration: none;
 }
 
@@ -38,6 +38,10 @@ body {
   color: hsl(0, 0%, 40%);
   fill: hsl(0, 0%, 40%);
   background: hsl(0, 0%, 90%);
+}
+.footer a {
+  color: inherit;
+  fill: inherit;
 }
 
 .task {
