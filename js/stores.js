@@ -41,6 +41,7 @@ var crudMethods = {
   setData: function(newData) {
     this.data.ls = newData;
     this.emit();
+    return Ok(c.OK);
   },
 
   onCreate(thing) {
@@ -176,6 +177,7 @@ var config = Reflux.createStore({
   setData(update) {
     this.data = assign({}, this.data, update);
     this.emit();
+    return Ok(c.OK);
   },
 
   getInitialState() {
