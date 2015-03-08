@@ -67,18 +67,6 @@ var crudMethods = {
     console.error('Failed to create time log', err);
   },
 
-  onBeginEdit(id) {
-    var thing = crud.get(this.getData(), id).expect(c.NOT_FOUND);  // throws if no thing
-    var editingThing = assign({}, thing, {editing: true});
-    crud.update(this.getData(), id, editingThing)(crudResult(this));
-  },
-
-  onCancelEdit(id) {
-    var thing = crud.get(this.getData(), id).expect(c.NOT_FOUND);  // throws if no thing
-    var editingThing = assign({}, thing, {editing: false});
-    crud.update(this.getData(), id, editingThing)(crudResult(this));
-  },
-
   onUpdate(id, thing) {
     crud.update(this.getData(), id, thing)(crudResult(this));
   },
@@ -94,9 +82,7 @@ var crudMethods = {
 
   onLoadCompleted(tasks) {
     this.data.status = Ok(c.LOADED);
-    this.setData(tasks.map((task) => assign({}, task, {
-      editing: false
-    })));
+    this.setData(tasks);
   },
 
   onLoadFailed(err) {

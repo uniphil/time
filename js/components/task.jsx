@@ -2,12 +2,14 @@ var assign = require('object-assign');
 var murmur = require('murmurhash-js/murmurhash3_gc');
 var husl = require('husl');
 var React = require('react');
+var {addons: {PureRenderMixin}} = require('react/addons');
 var {Link} = require('react-router');
 var actions = require('../actions');
 var Icon = require('./icon.jsx');
 
 
 var TagSet = React.createClass({
+  mixins: [PureRenderMixin],
   render() {
     var tags = this.props.tags;
 
@@ -29,13 +31,29 @@ var TagSet = React.createClass({
 
 var Task = React.createClass({
 
+  mixins: [PureRenderMixin],
+
+  getDefaultProps() {
+    return {
+      mode: 'display',
+    };
+  },
+
   getInitialState() {
-    return {hue: this.props.hue || 160};
+    return {
+      hue: this.props.hue || 160,
+      editing: false,
+    };
   },
 
   edit(e) {
     e && e.preventDefault();
-    actions.tasks.beginEdit(this.props.id);
+    this.setState({editing: true});
+  },
+
+  stopEdit(e) {
+    e && e.preventDefault();
+    this.setState({editing: false});
   },
 
   commit(e) {
@@ -52,19 +70,16 @@ var Task = React.createClass({
       tags: ((t) => t && t.split(',').map((t) => t.trim()) || [])(tagsEl.value.trim()),
     };
 
-    if (this.props.formMode !== 'create') {
+
+    if (this.props.mode === 'display') {
       task.id = this.props.id;
       task.timestamp = this.props.timestamp;
       actions.tasks.update(this.props.id, task);
+      this.stopEdit();
     } else {
       task.timestamp = (new Date()).getTime();  // timestamp
       actions.tasks.create(task);
     }
-  },
-
-  cancel(e) {
-    e && e.preventDefault();
-    actions.tasks.cancelEdit(this.props.id);
   },
 
   remove(e) {
@@ -83,15 +98,14 @@ var Task = React.createClass({
   },
 
   renderDisplay() {
-    var editing = this.props.editable,
-        deleted = this.props.deleted;
+    var deleted = this.props.deleted;
     return (
       <div
         className={'task' + (deleted ? ' task-deleted' : '')}
         style={{
           color: husl.toHex(this.props.hue, 67, 7),
           backgroundColor: husl.toHex(this.props.hue, 67, 95)}}
-        onDoubleClick={editing ? this.edit : null}>
+        onDoubleClick={this.edit}>
         <div className="task-duration">
           <span className="task-duration-value">{this.props.duration}</span> mins
         </div>
@@ -108,16 +122,14 @@ var Task = React.createClass({
           {this.props.summary}
         </div>
         <TagSet tags={this.props.tags} />
-        {editing && (
-          <div className="task-edit-buttons">
-            <button className="button bare" onClick={this.edit} title="edit">
-              <Icon id="pencil" alt="Edit task" />
-            </button>
-            <button className="button bare caution" onClick={this.remove} title="delete">
-              &times;
-            </button>
-          </div>
-        )}
+        <div className="task-edit-buttons">
+          <button className="button bare" onClick={this.edit} title="edit">
+            <Icon id="pencil" alt="Edit task" />
+          </button>
+          <button className="button bare caution" onClick={this.remove} title="delete">
+            &times;
+          </button>
+        </div>
         {deleted && (
           <div className="task-edit-buttons">
             <button className="button woo" onClick={this.restore} title="restore">
@@ -177,7 +189,7 @@ var Task = React.createClass({
             className="button inverse woo"
             title="save">save</button>
           {editMode && <button
-            onClick={this.cancel}
+            onClick={this.stopEdit}
             className="button"
             title="cancel">&times;</button>}
         </div>
@@ -186,7 +198,10 @@ var Task = React.createClass({
   },
 
   render() {
-    return this.props.asForm ? this.renderForm() : this.renderDisplay();
+    return {
+      display: this.state.editing? this.renderForm() : this.renderDisplay(),
+      create: this.renderForm(),
+    }[this.props.mode];
   }
 });
 

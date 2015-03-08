@@ -38,13 +38,11 @@ var TaskList = React.createClass({
     var grouped = this.props.aggregate ?
       group(this.props.tasks, this.props.aggregate) :
       [{tasks: this.props.tasks}];
-    var deleted = this.props.deleted;
     return (
       <div>
         {grouped.map((group, i) => (
           <div key={i}>
             {group.title && <h3>
-              {deleted && 'deleted '}
               {group.title}
               {' – '}
               <small>{group.tasks.reduce((total, task) => total+task.duration, 0)} mins</small>
@@ -54,10 +52,7 @@ var TaskList = React.createClass({
                 <li key={task.id} className="task-list-item">
                   <Task
                     {...task}
-                    key={task.id}
-                    asForm={task.editing}
-                    editable={this.props.editable}
-                    deleted={this.props.deleted} />
+                    key={task.id} />
                 </li>
               ))}
             </ul>

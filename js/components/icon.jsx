@@ -1,7 +1,9 @@
 var React = require('react');
+var {addons: {PureRenderMixin}} = require('react/addons');
 
 
 var Icon = React.createClass({
+  mixins: [PureRenderMixin],
   render() {
     return (
       <svg

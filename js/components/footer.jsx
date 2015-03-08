@@ -33,6 +33,9 @@ var credits = {
 
 
 var Footer = React.createClass({
+  shouldComponentUpdate() {
+    return false;
+  },
   render() {
     return (
       <div className="footer">

@@ -67,7 +67,6 @@ var Header = React.createClass({
   },
 
   render() {
-    var project = this.props.tasks[0] && this.props.tasks[0].project;
     return (
       <div className="header">
         <div className="tools">
@@ -81,10 +80,7 @@ var Header = React.createClass({
           export: <Export />,
           settings: <Settings  config={this.props.config} />,
         }[this.state.expanded]}
-        <Task
-          asForm={true}
-          project={project}
-          formMode="create" />
+        <Task mode="create" />
       </div>
     );
   },

@@ -31,9 +31,6 @@ tasks.create = Reflux.createAction({
 tasks.create.validateWith(validate.task);
 tasks.create.listenAndPromise(api.createTask);
 
-tasks.beginEdit = Reflux.createAction();
-tasks.cancelEdit = Reflux.createAction();
-
 tasks.update = Reflux.createAction({asyncResult: true});
 tasks.update.listenAndPromise(api.updateTask);
 
