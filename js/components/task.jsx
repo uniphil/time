@@ -30,7 +30,7 @@ var TagSet = React.createClass({
 var Task = React.createClass({
 
   getInitialState() {
-    return {hue: 160}
+    return {hue: this.props.hue || 160};
   },
 
   edit(e) {
