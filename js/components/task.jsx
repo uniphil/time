@@ -11,6 +11,7 @@ var Icon = require('./icon.jsx');
 
 
 function getHue(project, seed) {
+  seed = seed || config.data.seed;
   return murmur(project, seed) % 360;
 }
 
@@ -41,9 +42,15 @@ var Task = React.createClass({
   mixins: [Reflux.listenTo(config, 'onConfigChange'), PureRenderMixin],
 
   onConfigChange(newConfig) {
-    if (this.props.mode === 'create') { return; }
+    var project;
+    if (this.props.mode === 'create' ||
+        this.state.editing) {
+      project = this.refs.project.getDOMNode().value;
+    } else {
+      project = this.props.project;
+    }
     this.setState({
-      hue: getHue(this.props.project, newConfig.seed),
+      hue: getHue(project, newConfig.seed),
     });
   },
 
@@ -55,7 +62,7 @@ var Task = React.createClass({
 
   getInitialState() {
     return {
-      hue: this.props.mode === 'create' ? 160 : getHue(this.props.project, config.data.seed),
+      hue: this.props.mode === 'create' ? 160 : getHue(this.props.project),
       editing: false,
     };
   },
@@ -114,7 +121,7 @@ var Task = React.createClass({
 
   typeProject(e) {
     var projInput = this.refs.project.getDOMNode();
-    this.setState({hue: murmur(projInput.value) % 360});
+    this.setState({hue: getHue(projInput.value)});
   },
 
   renderDisplay() {
