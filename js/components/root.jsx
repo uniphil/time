@@ -11,15 +11,12 @@ var Footer = require('./footer.jsx');
 
 var Root = React.createClass({
 
-  mixins: [
-    Reflux.connect(stores.tasks, 'tasks'),
-    Reflux.connect(stores.config, 'config'),
-  ],
+  mixins: [Reflux.connect(stores.tasks, 'tasks')],
 
   render() {
     return (
       <div className="app">
-        <Header tasks={this.state.tasks.ls} config={this.state.config} />
+        <Header tasks={this.state.tasks.ls} />
         <RouteHandler {...this.props} tasks={this.state.tasks} />
         <Footer />
       </div>

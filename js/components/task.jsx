@@ -55,7 +55,7 @@ var Task = React.createClass({
 
   getInitialState() {
     return {
-      hue: this.props.mode === 'create' ? 160 : getHue(this.props.project, config.seed),
+      hue: this.props.mode === 'create' ? 160 : getHue(this.props.project, config.data.seed),
       editing: false,
     };
   },

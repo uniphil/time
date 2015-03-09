@@ -1,5 +1,8 @@
-var React = require('react');
+var murmur = require('murmurhash-js/murmurhash3_gc');
+var husl = require('husl');
+var React = require('react/addons');
 var {Link} = require('react-router');
+var Reflux = require('reflux');
 var stores = require('../stores');
 var actions = require('../actions');
 var Task = require('./task.jsx');
@@ -13,29 +16,73 @@ var Export = React.createClass({
 });
 
 
+function getRecentProjects(n) {
+  n = n || 5;
+  var recentTasks = [];
+  stores.tasks.data.every((task) => {
+    (recentTasks.indexOf(task.project) === -1) && recentTasks.push(task.project);
+    return recentTasks.length < n;
+  });
+  return recentTasks;
+}
+
+
 var Settings = React.createClass({
 
-  changeSeed(e) {
-    e && e.preventDefault();
-    actions.config.set({seed: parseInt(this.refs.seed.getDOMNode().value, 10) });
+  mixins: [
+    Reflux.listenTo(stores.config, 'onConfigChange'),
+    Reflux.listenTo(stores.tasks, 'onTasksChange'),
+    React.addons.LinkedStateMixin
+  ],
+
+  getInitialState() {
+    return {
+      seed: stores.config.data.seed,
+      sampleProjects: getRecentProjects(),
+    };
+  },
+
+  onConfigChange(newConfig) {
+    this.setState({seed: newConfig.seed});
+  },
+
+  onTasksChange(newTasks) {
+    this.setState({sampleProjects: getRecentProjects()})
   },
 
   setConfig(e) {
     e.preventDefault();
-    this.changeSeed();
+    actions.config.set({seed: parseInt(this.refs.seed.getDOMNode().value, 10) });
   },
 
   render() {
+    var seed = this.state.seed;
     return (
-      <form onSubmit={this.setConfig}>
-        <label htmlFor="seed">seed</label>
-        <input
-          id="seed"
-          ref="seed"
-          type="number"
-          defaultValue={this.props.config.seed}
-          onInput={this.changeSeed} />
-        <button type="submit" className="button">ok</button>
+      <form className="tool tool-settings" onSubmit={this.setConfig}>
+        <h3><Icon id="gear" /> Settings</h3>
+        <div className="setting-line">
+          <label htmlFor="seed">Projects Palette: </label>
+          <input
+            id="seed"
+            ref="seed"
+            type="number"
+            valueLink={this.linkState('seed')} />
+          <div className="sample-projects" title="preview">
+            {this.state.sampleProjects.map((p) => (
+              <div
+                key={p}
+                className="sample-project"
+                style={{backgroundColor: husl.toHex(murmur(p, seed), 67, 95)}}>
+                <span
+                  className="button inverse bare"
+                  style={{backgroundColor: husl.toHex(murmur(p, seed), 67, 58)}}>
+                  {p}
+                </span>
+              </div>
+            ))}
+          </div>
+          <button type="submit" className="button woo">set</button>
+        </div>
       </form>
     );
   },

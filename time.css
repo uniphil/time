@@ -15,7 +15,6 @@ body {
 }
 .header .tools {
   display: flex;
-  flex-direction: 'row';
   padding: 0.5em;
   color: hsl(0, 0%, 42%);
   fill: hsl(0, 0%, 42%);
@@ -28,6 +27,34 @@ body {
 }
 .header .tools h1 a {
   text-decoration: none;
+}
+.header .tool {
+  padding: 1em 0;
+}
+.header .tool h3 {
+  margin: 0 0 0.5em;
+}
+
+.setting-line {
+  display: flex;
+}
+.setting-line label {
+  align-self: center;
+}
+.setting-line input {
+  width: 3em;
+  padding-left: 0.5em;
+}
+.setting-line button {
+  padding: 0.5em 1em;
+  margin-left: 1em;
+}
+.sample-projects {
+  display: flex;
+}
+.sample-project {
+  margin-left: 0.5em;
+  padding: 0.5em 1em;
 }
 
 .footer {
