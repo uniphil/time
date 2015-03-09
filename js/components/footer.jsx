@@ -5,36 +5,42 @@ var Icon = require('./icon.jsx');
 var credits = {
   icons: [
     {
-      id: 'gear',
-      url: 'http://thenounproject.com/term/mechanical/1241/',
-      name: 'Gear',
-      creator: 'Johan H. W. Basberg',
       license: 'Public Domain',
-      source: 'The Noun Project',
+      icons: [
+        {
+          id: 'gear',
+          url: 'http://thenounproject.com/term/mechanical/1241/',
+          name: 'Gear',
+          creator: 'Johan H. W. Basberg',
+          source: 'The Noun Project',
+        },
+        {
+          id: 'trash',
+          url: 'http://thenounproject.com/term/trash/5109/',
+          name: 'Deleted',
+          creator: 'Karthick Nagarajan',
+          source: 'The Noun Project',
+        },
+      ],
     },
     {
-      id: 'download',
-      url: 'http://thenounproject.com/term/saving/65894/',
-      name: 'Download',
-      creator: 'Stefan Parnarov',
       license: 'CC-BY-3.0',
-      source: 'The Noun Project',
-    },
-    {
-      id: 'pencil',
-      url: 'http://thenounproject.com/term/edit/99661/',
-      name: 'Pencil',
-      creator: 'Mira Bear',
-      license: 'CC-BY-3.0',
-      source: 'The Noun Project',
-    },
-    {
-      id: 'trash',
-      url: 'http://thenounproject.com/term/trash/5109/',
-      name: 'Deleted',
-      creator: 'Karthick Nagarajan',
-      license: 'Public Domain',
-      source: 'The Noun Project',
+      icons: [
+        {
+          id: 'export',
+          url: 'http://thenounproject.com/term/share/79596/',
+          name: 'Export',
+          creator: 'Riley Isawesome',
+          source: 'The Noun Project',
+        },
+        {
+          id: 'pencil',
+          url: 'http://thenounproject.com/term/edit/99661/',
+          name: 'Pencil',
+          creator: 'Mira Bear',
+          source: 'The Noun Project',
+        },
+      ],
     },
   ],
 };
@@ -47,10 +53,17 @@ var Footer = React.createClass({
   render() {
     return (
       <div className="footer">
-        Icons:{' '}
-        {credits.icons.map((i) => <span key={i.id}>
-          <a href={i.url}><Icon id={i.id} alt={i.name + ' Icon'} /></a>
-          {' '}&ndash; {i.creator}{' '}
+        {credits.icons.map((g) => <span key={g.license}>
+          <strong>{g.license}:</strong>
+          {g.icons.map((i) => <a
+            href={i.url}
+            key={i.id}
+            className="button bare"
+            title={g.license}>
+            <Icon
+              id={i.id}
+              alt={i.name + ' Icon'} /> {i.creator}
+          </a>)}
         </span>)}
       </div>
     );

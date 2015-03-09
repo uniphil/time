@@ -123,8 +123,9 @@ var Header = React.createClass({
       <a
         href="#"
         onClick={this.toggler(id)}
+        alt={iconId + ' icon'}
         className={'button bare' + (this.state.expanded === id ? ' inverse' : '')}>
-        <Icon id={iconId} title={name} />
+        <Icon id={iconId} title={name} /> {name}
       </a>
     );
   },
@@ -134,11 +135,11 @@ var Header = React.createClass({
       <div className="header">
         <div className="tools">
           <h1>
-            <Link className="button woo" to="home">timekeep</Link>
+            <Link className="button woo bare" to="home">timekeep</Link>
           </h1>
-          {this.toolLink('export', 'export', 'download')}
+          {this.toolLink('export', 'export', 'export')}
           <Link to="deleted" className='button bare'>
-            <Icon id="trash" title="deleted tasks" alt="trash can" />
+            <Icon id="trash" title="deleted tasks" alt="trash can" /> deleted
           </Link>
           {this.toolLink('settings', 'settings', 'gear')}
         </div>
