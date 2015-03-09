@@ -4,8 +4,15 @@ var husl = require('husl');
 var React = require('react');
 var {addons: {PureRenderMixin}} = require('react/addons');
 var {Link} = require('react-router');
+var Reflux = require('reflux');
 var actions = require('../actions');
+var {config} = require('../stores');
 var Icon = require('./icon.jsx');
+
+
+function getHue(project, seed) {
+  return murmur(project, seed) % 360;
+}
 
 
 var TagSet = React.createClass({
@@ -31,7 +38,14 @@ var TagSet = React.createClass({
 
 var Task = React.createClass({
 
-  mixins: [PureRenderMixin],
+  mixins: [Reflux.listenTo(config, 'onConfigChange'), PureRenderMixin],
+
+  onConfigChange(newConfig) {
+    if (this.props.mode === 'create') { return; }
+    this.setState({
+      hue: getHue(this.props.project, newConfig.seed),
+    });
+  },
 
   getDefaultProps() {
     return {
@@ -41,7 +55,7 @@ var Task = React.createClass({
 
   getInitialState() {
     return {
-      hue: this.props.hue || 160,
+      hue: this.props.mode === 'create' ? 160 : getHue(this.props.project, config.seed),
       editing: false,
     };
   },
@@ -109,8 +123,8 @@ var Task = React.createClass({
       <div
         className={'task' + (deleted ? ' task-deleted' : '')}
         style={{
-          color: husl.toHex(this.props.hue, 67, 7),
-          backgroundColor: husl.toHex(this.props.hue, 67, 95)}}
+          color: husl.toHex(this.state.hue, 67, 7),
+          backgroundColor: husl.toHex(this.state.hue, 67, 95)}}
         onDoubleClick={this.edit}>
         <div className="task-duration">
           <span className="task-duration-value">{this.props.duration}</span> mins
@@ -118,7 +132,7 @@ var Task = React.createClass({
         <div className="task-project">
           <Link
             className="button accent inverse bare"
-            style={{backgroundColor: husl.toHex(this.props.hue, 67, 58)}}
+            style={{backgroundColor: husl.toHex(this.state.hue, 67, 58)}}
             to="project"
             params={{project: this.props.project}}>
             {this.props.project}
