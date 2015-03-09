@@ -162,11 +162,10 @@ var Task = React.createClass({
   },
 
   renderForm() {
-    var editMode = this.props.formMode !== 'create',
-        id = (name) => this._rootNodeID + name;
+    var editing = this.state.editing;
     return (
       <form
-        className={'task task-form task-form-' + (editMode? 'edit' : 'create')}
+        className={'task task-form task-form-' + (editing? 'edit' : 'create')}
         style={{backgroundColor: husl.toHex(this.state.hue, 67, 95)}}
         onSubmit={this.commit}>
         {this.labeledInput('duration', 'Time', {
@@ -199,7 +198,7 @@ var Task = React.createClass({
             type="submit"
             className="button inverse woo"
             title="save">save</button>
-          {editMode && <button
+          {editing && <button
             onClick={this.stopEdit}
             className="button"
             title="cancel">&times;</button>}
