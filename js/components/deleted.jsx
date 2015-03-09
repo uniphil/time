@@ -10,29 +10,12 @@ var c = require('../constants');
 
 var Deleted = React.createClass({
 
-  mixins: [Reflux.connect(stores.backups)],
-
-  componentWillMount() {
-    actions.taskBackups.load();
-  },
+  mixins: [Reflux.connect(stores.backups, 'tasks')],
 
   render() {
     return (
       <div>
-        {this.state.status({
-          Ok: () => <TaskList tasks={this.state.ls} aggregate={aggregate.date} deleted={true} />,
-          Err: (why) => {
-            if (why === c.NOT_LOADED) {
-              return <p>'not loaded'</p>;
-            } else if (why === c.LOADING) {
-              return <p>'loading...'</p>;
-            } else if (why === c.LOAD_FAILED) {
-              return <p>'load failed :('</p>;
-            } else {
-              return <p>'tasks didn\'t load...'</p>;
-            }
-          },
-        })}
+        <TaskList tasks={this.state.tasks} aggregate={aggregate.date} deleted={true} />
         <p>
           <Link className="button" to="home">home</Link>
         </p>

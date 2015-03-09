@@ -1,9 +1,7 @@
 var assign = require('object-assign');
-var murmur = require('murmurhash-js/murmurhash3_gc');
 var {Ok, Err} = require('results');
 var Reflux = require('reflux');
 var crud = require('./crud');
-var c = require('./constants');
 var actions = require('./actions');
 
 
@@ -11,130 +9,14 @@ Reflux.StoreMethods = assign(Reflux.StoreMethods || {}, {
   init() {
     this.data = this.getInitialState();
   },
+  setData(newData) {
+    this.data = newData;
+    this.emit();
+    this.saveLocal && this.saveLocal();
+    return Ok(this.data);
+  },
   emit() {
     this.trigger(this.data);
-  },
-});
-
-
-function crudResult(crudStore) {
-  return {
-    Ok: (stuff) => crudStore.setData(stuff),
-    Err: (err) => console.error('store error:', err),
-  };
-}
-
-
-var crudMethods = {
-
-  getInitialState() {
-    return {
-      ls: [],
-      status: Err(c.NOT_LOADED),
-    };
-  },
-
-  getData: function() {
-    return this.data.ls;
-  },
-
-  setData: function(newData) {
-    this.data.ls = newData;
-    this.emit();
-    return Ok(c.OK);
-  },
-
-  onCreate(thing) {
-    tmpThing = assign({}, thing, {
-      id: thing.clientId,
-      pending: true,
-    });
-    crud.create(this.getData(), tmpThing)(crudResult(this));
-  },
-
-  onCreateFailedValidation(thing, errors) {
-    console.warn('thing failed validation :(', thing, errors);
-  },
-
-  onCreateCompleted([savedThing, clientId]) {
-    crud.del(this.getData(), clientId)
-      .andThen((things) => crud.create(things, savedThing))
-      .andThen((things) => this.setData(things))
-      .unwrap();  // throws if err
-  },
-
-  onCreateFailed([err, clientId]) {
-    console.error('Failed to create time log', err);
-  },
-
-  onUpdate(id, thing) {
-    crud.update(this.getData(), id, thing)(crudResult(this));
-  },
-
-  onRemove(id) {
-    crud.del(this.getData(), id)(crudResult(this));
-  },
-
-  onLoad() {
-    this.data.status = Err(c.LOADING);
-    this.emit();
-  },
-
-  onLoadCompleted(tasks) {
-    this.data.status = Ok(c.LOADED);
-    this.setData(tasks);
-  },
-
-  onLoadFailed(err) {
-    this.data.status = Err(c.LOAD_FAILED);
-    this.emit();
-  },
-
-  get(id) {
-    return crud.get(this.getData(), id);
-  },
-
-  getWith(test) {
-    return crud.getWith(this.getData(), test);
-  },
-
-};
-
-
-var tasks = Reflux.createStore({
-  mixins: [crudMethods],
-  listenables: actions.tasks,
-  onRemove(id) {
-    this.get(id).andThen((task) => {
-      actions.taskBackups.create.triggerPromise(task)
-        .then(crudMethods.onRemove.call(this, id))
-        .catch((err) => console.error('creating backup failed, not deleting', err));
-    });
-  },
-  emit() {
-    // process data for display
-    var tasks = this.data.ls.map((task) => assign({}, task, {
-      hue: murmur(task.project, config.data.seed) % 360,
-    }));
-    this.trigger(assign({}, this.data, {ls: tasks}));
-  },
-});
-
-
-var backups = Reflux.createStore({
-  mixins: [crudMethods],
-  listenables: actions.taskBackups,
-  onRestore(id) {
-    this.get(id).andThen((task) => {
-      actions.tasks.create.triggerPromise(task)
-        .then(actions.taskBackups.remove(id))
-        .catch((err) => console.error('restoring task failed', err));
-    });
-  },
-  emit() {
-    // process data for display
-    var tasks = this.data.ls.map((task) => assign({}, task, {hue: 350}));
-    this.trigger(assign({}, this.data, {ls: tasks}));
   },
 });
 
@@ -143,37 +25,153 @@ var config = Reflux.createStore({
 
   listenables: actions.config,
 
-  init() {
-    actions.config.load();
-    this.data = this.getInitialState();
+  getInitialState() {
+    return JSON.parse(localStorage.getItem('config') || '{}');
   },
 
-  onLoadCompleted(config) {
-    this.setData(config);
+  onSet(update) {
+    this.setData(assign(this.data, update));
   },
 
   onSetFailedValidation(why) {
     console.error('validating config change failed', why);
   },
 
-  onSetCompleted(newConfig) {
-    this.setData(newConfig);
+  saveLocal() {
+    localStorage.setItem('config', JSON.stringify(this.data));
+    return Ok(this.data);
   },
 
-  setData(update) {
-    this.data = assign({}, this.data, update);
-    this.emit();
-    return Ok(c.OK);
-  },
-
-  getInitialState() {
-    return {seed: 0};
+  onLocalSync(newData) {
+    this.setData(newData)
+      .unwrap();
   },
 
 });
 
 
-tasks.listenTo(config, tasks.emit);
+var tasks = Reflux.createStore({
+
+  listenables: actions.tasks,
+
+  getInitialState() {
+    return JSON.parse(localStorage.getItem('tasks') || '[]');
+  },
+
+  onCreate(newTask) {
+    newTask = assign({}, newTask, {
+      id: '' + (Math.max.apply(null, this.data.map((t) => (parseInt(t.id, 10) || 0)).concat(0)) + 1),
+    });
+    crud.create(this.data, newTask)
+      .andThen(this.setData.bind(this))
+      .unwrap();  // throw & log the err if anything failed
+  },
+
+  onCreateFailedValidation(why) {
+    console.error('validating config change failed', why);
+  },
+
+  onUpdate(id, updated) {
+    crud.update(this.data, id, updated)
+      .andThen(this.setData.bind(this))
+      .unwrap();
+  },
+
+  onRemove(id) {
+    crud.get(this.data, id)
+      .andThen((task) => Ok(actions.taskBackups.create(task)))
+      .andThen(() => crud.del(this.data, id))
+      .unwrap();
+    crud.del(this.data, id)
+      .andThen(this.setData.bind(this))
+      .unwrap();
+  },
+
+  onLocalSync(newData) {
+    this.setData(newData)
+      .unwrap();
+  },
+
+  saveLocal() {
+    localStorage.setItem('tasks', JSON.stringify(this.data));
+    return Ok(this.data);
+  },
+
+});
+
+
+var backups = Reflux.createStore({
+
+  listenables: actions.taskBackups,
+
+  getInitialState() {
+    return JSON.parse(localStorage.getItem('backups') || '[]');
+  },
+
+  onCreate(savedTask) {
+    savedTask = assign({}, savedTask, {
+      id: '' + (Math.max.apply(null, this.data.map((t) => (parseInt(t.id, 10) || 0)).concat(0)) + 1),
+      deleted: true,
+    });
+    crud.create(this.data, savedTask)
+      .andThen(this.setData.bind(this))
+      .unwrap();  // throw & log the err if anything failed
+  },
+
+  onCreateFailedValidation(why) {
+    console.error('validating config change failed', why);
+  },
+
+  onRestore(id) {
+    crud.get(this.data, id)
+      .andThen((task) => {
+        task = assign({}, task);
+        delete task.deleted;
+        return Ok(actions.tasks.create(task))
+      })  // todo fail and bail if err
+      .andThen(() => crud.del(this.data, id)
+        .andThen(this.setData.bind(this)))
+      .unwrap();
+  },
+
+  onReallyRemove(id) {
+    crud.del(this.data, id)
+      .andThen(this.setData.bind(this))
+      .unwrap();
+  },
+
+  onLocalSync(newData) {
+    this.setData(newData)
+      .unwrap();
+  },
+
+  saveLocal() {
+    localStorage.setItem('backups', JSON.stringify(this.data));
+    return Ok(this.data);
+  },
+
+});
+
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'config') {
+    actions.config.localSync(JSON.parse(e.newValue));
+  }
+});
+
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'tasks') {
+    actions.tasks.localSync(JSON.parse(e.newValue));
+  }
+});
+
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'backups') {
+    actions.taskBackups.localSync(JSON.parse(e.newValue));
+  }
+});
 
 
 module.exports = {

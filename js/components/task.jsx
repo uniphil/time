@@ -48,6 +48,7 @@ var Task = React.createClass({
 
   edit(e) {
     e && e.preventDefault();
+    if (this.props.deleted) { return; }
     this.setState({editing: true});
   },
 
@@ -87,6 +88,11 @@ var Task = React.createClass({
     actions.tasks.remove(this.props.id);
   },
 
+  reallyRemove(e) {
+    e && e.preventDefault();
+    actions.taskBackups.reallyRemove(this.props.id);
+  },
+
   restore(e) {
     e && e.preventDefault();
     actions.taskBackups.restore(this.props.id);
@@ -122,18 +128,23 @@ var Task = React.createClass({
           {this.props.summary}
         </div>
         <TagSet tags={this.props.tags} />
-        <div className="task-edit-buttons">
-          <button className="button bare" onClick={this.edit} title="edit">
-            <Icon id="pencil" alt="Edit task" />
-          </button>
-          <button className="button bare caution" onClick={this.remove} title="delete">
-            &times;
-          </button>
-        </div>
+        {!deleted && (
+          <div className="task-edit-buttons">
+            <button className="button bare" onClick={this.edit} title="edit">
+              <Icon id="pencil" alt="Edit task" />
+            </button>
+            <button className="button bare caution" onClick={this.remove} title="delete">
+              &times;
+            </button>
+          </div>
+        )}
         {deleted && (
           <div className="task-edit-buttons">
             <button className="button woo" onClick={this.restore} title="restore">
               restore
+            </button>{' '}
+            <button className="button caution" onClick={this.reallyRemove} title="delete">
+              delete
             </button>
           </div>
         )}

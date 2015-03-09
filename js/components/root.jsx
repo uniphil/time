@@ -16,28 +16,11 @@ var Root = React.createClass({
     Reflux.connect(stores.config, 'config'),
   ],
 
-  componentWillMount() {
-    actions.tasks.load();
-  },
-
   render() {
     return (
       <div className="app">
         <Header tasks={this.state.tasks.ls} config={this.state.config} />
-        {this.state.tasks.status({
-          Ok: () => <RouteHandler {...this.props} tasks={this.state.tasks.ls} />,
-          Err: (why) => {
-            if (why === c.NOT_LOADED) {
-              return <p>'not loaded'</p>;
-            } else if (why === c.LOADING) {
-              return <p>'loading...'</p>;
-            } else if (why === c.LOAD_FAILED) {
-              return <p>'load failed :('</p>;
-            } else {
-              return <p>'tasks didn\'t load...'</p>;
-            }
-          },
-        })}
+        <RouteHandler {...this.props} tasks={this.state.tasks} />
         <Footer />
       </div>
     );

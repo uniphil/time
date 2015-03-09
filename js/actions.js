@@ -1,10 +1,6 @@
 var assign = require('object-assign');
 var Reflux = require('reflux');
-var api = require('./api');
 var validate = require('./validate');
-
-
-var clientId = +new Date();
 
 
 Reflux.ActionMethods = assign(Reflux.ActionMethods || {}, {
@@ -18,55 +14,30 @@ Reflux.ActionMethods = assign(Reflux.ActionMethods || {}, {
         return false;
       }
     };
-  }
+  },
 });
 
 
 var tasks = {};
-
-tasks.create = Reflux.createAction({
-  asyncResult: true,
-  preEmit: (task) => [assign({}, task, {clientId: 'c' + clientId++})],
-});
+tasks.create = Reflux.createAction();
 tasks.create.validateWith(validate.task);
-tasks.create.listenAndPromise(api.createTask);
-
-tasks.update = Reflux.createAction({asyncResult: true});
-tasks.update.listenAndPromise(api.updateTask);
-
-tasks.remove = Reflux.createAction({asyncResult: true});
-tasks.remove.listenAndPromise(api.removeTask);
-
-tasks.load = Reflux.createAction({asyncResult: true});
-tasks.load.listenAndPromise(api.loadTasks);
+tasks.update = Reflux.createAction();
+tasks.remove = Reflux.createAction();
+tasks.localSync = Reflux.createAction();
 
 
 var taskBackups = {};
-
-taskBackups.create = Reflux.createAction({
-  asyncResult: true,
-  preEmit: (task) => [assign({}, task, {clientId: 'c' + clientId++})],
-});
+taskBackups.create = Reflux.createAction();
 taskBackups.create.validateWith(validate.task);
-taskBackups.create.listenAndPromise(api.saveBackup);
-
 taskBackups.restore = Reflux.createAction();
-
-taskBackups.remove = Reflux.createAction({asyncResult: true});
-taskBackups.remove.listenAndPromise(api.reallyDelete);
-
-taskBackups.load = Reflux.createAction({asyncResult: true});
-taskBackups.load.listenAndPromise(api.loadBackups);
+taskBackups.reallyRemove = Reflux.createAction();
+taskBackups.localSync = Reflux.createAction();
 
 
 var config = {};
-
-config.set = Reflux.createAction({asyncResult: true});
+config.set = Reflux.createAction();
 config.set.validateWith(validate.config);
-config.set.listenAndPromise(api.setConfig);
-
-config.load = Reflux.createAction({asyncResult: true});
-config.load.listenAndPromise(api.loadConfig);
+config.localSync = Reflux.createAction();
 
 
 module.exports = {
