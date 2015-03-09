@@ -28,6 +28,14 @@ var credits = {
       license: 'CC-BY-3.0',
       source: 'The Noun Project',
     },
+    {
+      id: 'trash',
+      url: 'http://thenounproject.com/term/trash/5109/',
+      name: 'Deleted',
+      creator: 'Karthick Nagarajan',
+      license: 'Public Domain',
+      source: 'The Noun Project',
+    },
   ],
 };
 

@@ -137,6 +137,9 @@ var Header = React.createClass({
             <Link className="button woo" to="home">timekeep</Link>
           </h1>
           {this.toolLink('export', 'export', 'download')}
+          <Link to="deleted" className='button bare'>
+            <Icon id="trash" title="deleted tasks" alt="trash can" />
+          </Link>
           {this.toolLink('settings', 'settings', 'gear')}
         </div>
         {{

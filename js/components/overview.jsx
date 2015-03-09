@@ -12,11 +12,6 @@ var Overview = React.createClass({
           tasks={this.props.tasks}
           aggregate={aggregate.date}
           editable={true} />
-        <p>
-          <Link className="button" to="projects">projects</Link>{' '}
-          <Link className="button" to="tags">tags</Link>{' '}
-          <Link className="button" to="deleted">deleted</Link>
-        </p>
       </div>
     );
   }
