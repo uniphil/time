@@ -21,13 +21,27 @@ Reflux.StoreMethods = assign(Reflux.StoreMethods || {}, {
 });
 
 
-var config = Reflux.createStore({
+function createLocalStore(key, empty, def) {
+  var store = Reflux.createStore(assign({}, {
+    getInitialState() {
+      return JSON.parse(localStorage.getItem(key) || JSON.stringify(empty));
+    },
+    saveLocal() {
+      localStorage.setItem(key, JSON.stringify(this.data));
+    },
+  }, def));
+  window.addEventListener('storage', (e) => {
+    if (e.key === key) {
+      store.setData(JSON.parse(e.newValue)).unwrap();
+    }
+  });
+  return store;
+}
+
+
+var config = createLocalStore('config', {}, {
 
   listenables: actions.config,
-
-  getInitialState() {
-    return JSON.parse(localStorage.getItem('config') || '{}');
-  },
 
   onSet(update) {
     this.setData(assign(this.data, update));
@@ -37,26 +51,12 @@ var config = Reflux.createStore({
     console.error('validating config change failed', why);
   },
 
-  saveLocal() {
-    localStorage.setItem('config', JSON.stringify(this.data));
-    return Ok(this.data);
-  },
-
-  onLocalSync(newData) {
-    this.setData(newData)
-      .unwrap();
-  },
-
 });
 
 
-var tasks = Reflux.createStore({
+var tasks = createLocalStore('tasks', [], {
 
   listenables: actions.tasks,
-
-  getInitialState() {
-    return JSON.parse(localStorage.getItem('tasks') || '[]');
-  },
 
   onCreate(newTask) {
     newTask = assign({}, newTask, {
@@ -87,26 +87,12 @@ var tasks = Reflux.createStore({
       .unwrap();
   },
 
-  onLocalSync(newData) {
-    this.setData(newData)
-      .unwrap();
-  },
-
-  saveLocal() {
-    localStorage.setItem('tasks', JSON.stringify(this.data));
-    return Ok(this.data);
-  },
-
 });
 
 
-var backups = Reflux.createStore({
+var backups = createLocalStore('backups', [], {
 
   listenables: actions.taskBackups,
-
-  getInitialState() {
-    return JSON.parse(localStorage.getItem('backups') || '[]');
-  },
 
   onCreate(savedTask) {
     savedTask = assign({}, savedTask, {
@@ -140,37 +126,6 @@ var backups = Reflux.createStore({
       .unwrap();
   },
 
-  onLocalSync(newData) {
-    this.setData(newData)
-      .unwrap();
-  },
-
-  saveLocal() {
-    localStorage.setItem('backups', JSON.stringify(this.data));
-    return Ok(this.data);
-  },
-
-});
-
-
-window.addEventListener('storage', (e) => {
-  if (e.key === 'config') {
-    actions.config.localSync(JSON.parse(e.newValue));
-  }
-});
-
-
-window.addEventListener('storage', (e) => {
-  if (e.key === 'tasks') {
-    actions.tasks.localSync(JSON.parse(e.newValue));
-  }
-});
-
-
-window.addEventListener('storage', (e) => {
-  if (e.key === 'backups') {
-    actions.taskBackups.localSync(JSON.parse(e.newValue));
-  }
 });
 
 
