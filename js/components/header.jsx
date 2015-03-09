@@ -134,7 +134,7 @@ var Header = React.createClass({
       <div className="header">
         <div className="tools">
           <h1>
-            <Link className="button woo" to="home">track time</Link>
+            <Link className="button woo" to="home">timekeep</Link>
           </h1>
           {this.toolLink('export', 'export', 'download')}
           {this.toolLink('settings', 'settings', 'gear')}
