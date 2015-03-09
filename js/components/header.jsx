@@ -10,8 +10,24 @@ var Icon = require('./icon.jsx');
 
 
 var Export = React.createClass({
+
+  mixins: [Reflux.connect(stores.tasks, 'tasks')],
+
+  getInitialState() {
+    return {mode: 'json'};
+  },
+
   render() {
-    return <div>helloooooo exports</div>;
+    return (
+      <div className="tool tool-export">
+        <h3><Icon id="download" /> Export</h3>
+        <p>All your tasks in JSON format:</p>
+        <textarea
+          className="export-box"
+          value={JSON.stringify(this.state.tasks)}
+          readOnly={true} />
+      </div>
+    );
   }
 });
 
