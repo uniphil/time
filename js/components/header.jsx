@@ -20,7 +20,7 @@ var Export = React.createClass({
   render() {
     return (
       <div className="tool tool-export">
-        <h3><Icon id="download" /> Export</h3>
+        <h3><Icon id="export" /> Export</h3>
         <p>All your tasks in JSON format:</p>
         <textarea
           className="export-box"
