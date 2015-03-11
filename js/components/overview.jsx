@@ -89,8 +89,7 @@ var Overview = React.createClass({
       <div>
         <Query />
         <TaskList
-          tasks={this.props.tasks}
-          aggregate={aggregate.date}
+          tasks={this.props.query(this.props.tasks)}
           editable={true} />
       </div>
     );

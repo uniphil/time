@@ -183,7 +183,7 @@ var query = Reflux.createStore({
   },
 
   getInitialState() {
-    return (t) => t;
+    return (tasks) => nestGroups(['date'], tasks);
   },
 
 });

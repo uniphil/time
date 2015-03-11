@@ -34,31 +34,38 @@ function group(tasks, grouper) {
 
 var TaskList = React.createClass({
 
-  render() {
-    var grouped = this.props.aggregate ?
-      group(this.props.tasks, this.props.aggregate) :
-      [{tasks: this.props.tasks}];
+  renderGroup(group) {
     return (
       <div>
-        {grouped.map((group, i) => (
-          <div key={i}>
-            {group.title && <h3>
-              {group.title}
+        {group.children.map((c) => (
+          <div key={c.group}>
+            <h3>
+              {group.name}: {c.group}
               {' – '}
-              <small>{group.tasks.reduce((total, task) => total+task.duration, 0)} mins</small>
-            </h3>}
-            <ul className="task-list">
-              {group.tasks.map((task) => (
-                <li key={task.id} className="task-list-item">
-                  <Task
-                    {...task}
-                    key={task.id} />
-                </li>
-              ))}
-            </ul>
+              <small>... some amount of time...</small>
+            </h3>
+            <TaskList {...this.props} tasks={c.children} />
           </div>
         ))}
       </div>
+    );
+  },
+
+  render() {
+    var tasks = this.props.tasks;
+    if (tasks.type === 'group') {
+      return this.renderGroup(tasks);
+    }
+    return (
+      <ol className="task-list">
+        {tasks.map((task) => (
+          <li key={task.id} className="task-list-item">
+            <Task
+              {...task}
+              key={task.id} />
+          </li>
+        ))}
+      </ol>
     );
   }
 });
