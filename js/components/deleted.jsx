@@ -2,7 +2,6 @@ var React = require('react');
 var Reflux = require('reflux');
 var {Link} = require('react-router');
 var TaskList = require('./task-list.jsx');
-var aggregate = require('../aggregate');
 var stores = require('../stores');
 var actions = require('../actions');
 var c = require('../constants');

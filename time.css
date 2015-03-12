@@ -197,6 +197,20 @@ body {
 }
 
 
+.icon.credit {
+  margin: 0.5em;
+}
+.expanded.icon > .button {
+  padding: 0.25em;
+  background: hsl(0, 0%, 95%);
+}
+.expanded.icon > .button:hover {
+  background: hsl(0, 0%, 95%);
+  color: hsl(0, 0%, 20%);
+  fill: hsl(0, 0%, 20%);
+}
+
+
 .nofocus {
   outline: none;
 }

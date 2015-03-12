@@ -3,7 +3,6 @@ var {addons: {update, PureRenderMixin}} = require('react/addons');
 var TaskList = require('./task-list.jsx');
 var Icon = require('./icon.jsx');
 var actions = require('../actions');
-var aggregate = require('../aggregate');
 
 
 var Grouper = React.createClass({
