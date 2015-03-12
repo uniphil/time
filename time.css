@@ -171,6 +171,13 @@ body {
   border: none;
 }
 
+.swap.button {
+  margin: 0 0.25em;
+}
+.group.buttons {
+  margin: 0 0.5em;
+}
+
 
 .accent {
   color: hsl(280, 50%, 50%);
@@ -183,6 +190,11 @@ body {
 .caution {
   color: hsl(350, 60%, 50%);
   fill: hsl(350, 60%, 50%);
+}
+
+
+.nofocus {
+  outline: none;
 }
 
 
