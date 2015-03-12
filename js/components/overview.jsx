@@ -1,6 +1,5 @@
 var React = require('react');
 var {addons: {update, PureRenderMixin}} = require('react/addons');
-var {Link} = require('react-router');
 var TaskList = require('./task-list.jsx');
 var Icon = require('./icon.jsx');
 var actions = require('../actions');

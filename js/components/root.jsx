@@ -1,6 +1,6 @@
 var React = require('react');
 var Reflux = require('reflux');
-var {Link, RouteHandler} = require('react-router');
+var {RouteHandler} = require('react-router');
 var stores = require('../stores');
 var actions = require('../actions');
 var c = require('../constants');

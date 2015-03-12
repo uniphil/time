@@ -9,10 +9,7 @@ var TaskDetail = React.createClass({
     var task = this.props.tasks.filter((t) => t.id === this.props.params.taskId)[0];
     if (!task) { return <NotFound /> }
     return (
-      <div>
-        <Task {...task} />
-        <p><Link to="home">home</Link></p>
-      </div>
+      <Task {...task} />
     );
   }
 });

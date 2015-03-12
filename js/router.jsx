@@ -4,16 +4,13 @@ module.exports = {
 
 var React = require('react');
 var Router = require('react-router');
-var {Route, DefaultRoute} = Router;
+var {Route, DefaultRoute, NotFoundRoute} = Router;
 
 var Root = require('./components/root.jsx');
 var Overview = require('./components/overview.jsx');
 var TaskDetail = require('./components/task-detail.jsx');
 var Deleted = require('./components/deleted.jsx');
-var ProjectsOverview = require('./components/projects-overview.jsx');
-var ProjectDetail = require('./components/project-detail.jsx');
-var TagsOverview = require('./components/tags-overview.jsx');
-var TagDetail = require('./components/tag-detail.jsx');
+var NotFound = require('./components/not-found.jsx');
 
 
 var routes = (
@@ -21,14 +18,8 @@ var routes = (
     <DefaultRoute handler={Overview} />
     <Route name="task" path="tasks/:taskId" handler={TaskDetail} />
     <Route name="deleted" path="deleted/" handler={Deleted} />
-    <Route name="projects" path="projects/" handler={ProjectsOverview} />
-    <Route name="project" path="projects/:project" handler={ProjectDetail} />
-    <Route name="tags" path="tags/" handler={TagsOverview} />
-    <Route name="tag" path="tags/:tag" handler={TagDetail} />
+    <NotFoundRoute handler={NotFound} />
   </Route>
 );
 
-var router = Router.create({
-  routes: routes,
-  //location: Router.HistoryLocation
-});
+var router = Router.create({routes: routes});

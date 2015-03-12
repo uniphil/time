@@ -57,16 +57,16 @@ var TaskList = React.createClass({
             <h3>
               {name === 'project' ?
                 <Link
-                  to="project"
-                  params={{project: c.group}}
+                  to="home"
+                  query={{filter: {project: {only: [c.group]}}}}
                   className="button inverse bare"
                   style={{backgroundColor: husl.toHex(Task.getHue(c.group), 67, 58)}}>
                   {c.group}
                 </Link> :
                 name === 'tag' ?
                   <Link
-                    to="tag"
-                    params={{tag: c.group}}
+                    to="home"
+                    query={{filter: {tag: {only: [c.group]}}}}
                     className="button accent">
                     {c.group}
                   </Link> :
