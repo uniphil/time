@@ -6,6 +6,11 @@ body {
   margin: 0;
 }
 
+input {
+  border: 1px solid hsl(0, 0%, 70%);
+  background-color: hsl(0, 0%, 100%);
+}
+
 .app {
   max-width: 51em;
   margin: 0 auto;
