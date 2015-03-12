@@ -59,15 +59,17 @@ var Query = React.createClass({
     };
   },
 
-  toggleGrouper(id) {
-    var u = {}; u[id] = {active: {$apply: (a) => !a}};
-    var newState = update(this.state, {group: u});
+  componentWillUpdate(nextProps, nextState) {
     actions.query.set({
-      group: asArrByWeight(newState.group)
+      group: asArrByWeight(nextState.group)
         .filter((g) => g.active)
         .map((g) => g.id)
     });
-    this.setState(newState);
+  },
+
+  toggleGrouper(id) {
+    var u = {}; u[id] = {active: {$apply: (a) => !a}};
+    this.setState(update(this.state, {group: u}));
   },
 
   swapGroupAround(i) {
@@ -75,13 +77,7 @@ var Query = React.createClass({
     var u = {};
     u[ab[0].id] = {weight: {$set: ab[1].weight}};
     u[ab[1].id] = {weight: {$set: ab[0].weight}};
-    var newState = update(this.state, {group: u});
-    actions.query.set({
-      group: asArrByWeight(newState.group)
-        .filter((g) => g.active)
-        .map((g) => g.id)
-    });
-    this.setState(newState);
+    this.setState(update(this.state, {group: u}));
   },
 
   render() {
@@ -100,7 +96,7 @@ var Query = React.createClass({
                   className="swap button bare nofocus"
                   title="swap order"
                   onClick={() => this.swapGroupAround(i)}>
-                  <Icon id="swap" alt="swap grouping order" />
+                  <Icon id="swap" alt="reorder grouping" />
                 </button>)}
             </span>
           ))}
