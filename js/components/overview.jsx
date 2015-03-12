@@ -1,5 +1,5 @@
 var React = require('react');
-var {addons: {update}} = require('react/addons');
+var {addons: {update, PureRenderMixin}} = require('react/addons');
 var {Link} = require('react-router');
 var TaskList = require('./task-list.jsx');
 var Icon = require('./icon.jsx');
@@ -36,6 +36,8 @@ function asArrByWeight(things) {
 
 
 var Query = React.createClass({
+
+  mixins: [PureRenderMixin],
 
   getInitialState() {
     return {
@@ -84,7 +86,7 @@ var Query = React.createClass({
     var groupsByWeight = asArrByWeight(this.state.group);
     return (
       <div className="query">
-        <strong>group</strong>
+        <strong>group tasks by: </strong>
         <span className="group buttons">
           {groupsByWeight.map((g, i) => (
             <span key={g.id}>
@@ -93,7 +95,7 @@ var Query = React.createClass({
                 toggle={this.toggleGrouper} />
               {i < (groupsByWeight.length - 1) && (
                 <button
-                  className="swap button bare nofocus"
+                  className="swap button bare accent nofocus"
                   title="swap order"
                   onClick={() => this.swapGroupAround(i)}>
                   <Icon id="swap" alt="reorder grouping" />

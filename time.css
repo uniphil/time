@@ -125,6 +125,10 @@ body {
   background: hsl(0, 0%, 95%);
 }
 
+.group .group {
+  padding-left: 2em;
+}
+
 
 /* attribute-oriented */
 

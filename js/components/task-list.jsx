@@ -1,4 +1,6 @@
+var husl = require('husl');
 var React = require('react');
+var {Link} = require('react-router');
 var Task = require('./task.jsx');
 
 
@@ -32,17 +34,47 @@ function group(tasks, grouper) {
 }
 
 
+function sumTime(tasks) {
+  var children = tasks.children;
+  if (children.type === 'group') {
+    return tasks.children.children  // ugh...
+      .map(sumTime)
+      .reduce((a, b) => a + b, 0);
+  }
+  return tasks.children
+    .map((c) => c.duration)
+    .reduce((a, b) => a + b, 0);
+}
+
+
 var TaskList = React.createClass({
 
-  renderGroup(group) {
+  renderGroup(name, group) {
     return (
-      <div>
+      <div className="group">
         {group.children.map((c) => (
           <div key={c.group}>
             <h3>
-              {group.name}: {c.group}
-              {' – '}
-              <small>... some amount of time...</small>
+              {name === 'project' ?
+                <Link
+                  to="project"
+                  params={{project: c.group}}
+                  className="button inverse bare"
+                  style={{backgroundColor: husl.toHex(Task.getHue(c.group), 67, 58)}}>
+                  {c.group}
+                </Link> :
+                name === 'tag' ?
+                  <Link
+                    to="tag"
+                    params={{tag: c.group}}
+                    className="button accent">
+                    {c.group}
+                  </Link> :
+                    c.group}
+              <small>
+                {' – '}
+                {sumTime(c)} mins
+              </small>
             </h3>
             <TaskList {...this.props} tasks={c.children} />
           </div>
@@ -54,7 +86,7 @@ var TaskList = React.createClass({
   render() {
     var tasks = this.props.tasks;
     if (tasks.type === 'group') {
-      return this.renderGroup(tasks);
+      return this.renderGroup(tasks.name, tasks);
     }
     return (
       <ol className="task-list">

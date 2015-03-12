@@ -237,4 +237,7 @@ var Task = React.createClass({
 });
 
 
+Task.getHue = getHue;
+
+
 module.exports = Task;
