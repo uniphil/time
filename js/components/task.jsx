@@ -25,7 +25,10 @@ var TagSet = React.createClass({
       <span>
         {tags.map((tag, i) => (
           <span key={tag}>
-            <Link className="button accent" to="tag" params={{tag: tag}}>
+            <Link
+              to="home"
+              query={{filter: {tag: {only: [tag]}}}}
+              className="button accent" >
               {tag}
             </Link>
             {i < tags.length-1 ? <span className="hide-sep">, </span> : ''}
@@ -138,10 +141,10 @@ var Task = React.createClass({
         </div>
         <div className="task-project">
           <Link
+            to="home"
+            query={{filter: {project: {only: [this.props.project]}}}}
             className="button accent inverse bare"
-            style={{backgroundColor: husl.toHex(this.state.hue, 67, 58)}}
-            to="project"
-            params={{project: this.props.project}}>
+            style={{backgroundColor: husl.toHex(this.state.hue, 67, 58)}}>
             {this.props.project}
           </Link>
         </div>
@@ -235,6 +238,9 @@ var Task = React.createClass({
     }[this.props.mode];
   }
 });
+
+
+Task.getHue = getHue;
 
 
 module.exports = Task;

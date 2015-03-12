@@ -14,12 +14,7 @@ var Deleted = React.createClass({
 
   render() {
     return (
-      <div>
-        <TaskList tasks={this.state.tasks} aggregate={aggregate.date} deleted={true} />
-        <p>
-          <Link className="button" to="home">home</Link>
-        </p>
-      </div>
+      <TaskList tasks={this.state.tasks} deleted={true} />
     );
   }
 });

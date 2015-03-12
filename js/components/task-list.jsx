@@ -1,4 +1,6 @@
+var husl = require('husl');
 var React = require('react');
+var {Link} = require('react-router');
 var Task = require('./task.jsx');
 
 
@@ -32,33 +34,70 @@ function group(tasks, grouper) {
 }
 
 
+function sumTime(tasks) {
+  var children = tasks.children;
+  if (children.type === 'group') {
+    return tasks.children.children  // ugh...
+      .map(sumTime)
+      .reduce((a, b) => a + b, 0);
+  }
+  return tasks.children
+    .map((c) => c.duration)
+    .reduce((a, b) => a + b, 0);
+}
+
+
 var TaskList = React.createClass({
 
-  render() {
-    var grouped = this.props.aggregate ?
-      group(this.props.tasks, this.props.aggregate) :
-      [{tasks: this.props.tasks}];
+  renderGroup(name, group) {
     return (
-      <div>
-        {grouped.map((group, i) => (
-          <div key={i}>
-            {group.title && <h3>
-              {group.title}
-              {' – '}
-              <small>{group.tasks.reduce((total, task) => total+task.duration, 0)} mins</small>
-            </h3>}
-            <ul className="task-list">
-              {group.tasks.map((task) => (
-                <li key={task.id} className="task-list-item">
-                  <Task
-                    {...task}
-                    key={task.id} />
-                </li>
-              ))}
-            </ul>
+      <div className="group">
+        {group.children.map((c) => (
+          <div key={c.group}>
+            <h3>
+              {name === 'project' ?
+                <Link
+                  to="home"
+                  query={{filter: {project: {only: [c.group]}}}}
+                  className="button inverse bare"
+                  style={{backgroundColor: husl.toHex(Task.getHue(c.group), 67, 58)}}>
+                  {c.group}
+                </Link> :
+                name === 'tag' ?
+                  <Link
+                    to="home"
+                    query={{filter: {tag: {only: [c.group]}}}}
+                    className="button accent">
+                    {c.group}
+                  </Link> :
+                    c.group}
+              <small>
+                {' – '}
+                {sumTime(c)} mins
+              </small>
+            </h3>
+            <TaskList {...this.props} tasks={c.children} />
           </div>
         ))}
       </div>
+    );
+  },
+
+  render() {
+    var tasks = this.props.tasks;
+    if (tasks.type === 'group') {
+      return this.renderGroup(tasks.name, tasks);
+    }
+    return (
+      <ol className="task-list">
+        {tasks.map((task) => (
+          <li key={task.id} className="task-list-item">
+            <Task
+              {...task}
+              key={task.id} />
+          </li>
+        ))}
+      </ol>
     );
   }
 });

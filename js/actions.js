@@ -40,8 +40,13 @@ config.set.validateWith(validate.config);
 config.localSync = Reflux.createAction();
 
 
+var query = {};
+query.set = Reflux.createAction();
+
+
 module.exports = {
   tasks: tasks,
   taskBackups: taskBackups,
   config: config,
+  query: query,
 };

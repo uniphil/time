@@ -129,8 +129,69 @@ var backups = createLocalStore('backups', [], {
 });
 
 
+function _group(quantizer, tasks) {
+  var grouped = [],
+      keyIndexMap = {},
+      i, j, k, ks, t;
+
+  for (i = 0; i < tasks.length; i++) {
+    t = tasks[i];
+    ks = quantizer(t);
+    for (j = 0; j < ks.length; j++) {
+      k = ks[j];
+      if (typeof keyIndexMap[k] === 'undefined') {
+        keyIndexMap[k] = grouped.length;
+        grouped.push({group: k, children: []});
+      }
+      grouped[keyIndexMap[k]].children.push(t);
+    }
+  }
+
+  return grouped;
+}
+
+var quantizers = {
+  date: (t) => [(new Date(t.timestamp)).toLocaleDateString()],
+  project: (t) => [t.project],
+  tag: (t) => t.tags,
+};
+
+function qgroup(qname, tasks) {
+  return {
+    type: 'group',
+    name: qname,
+    children: _group(quantizers[qname], tasks),
+  };
+}
+
+function nestGroups(groupers, tasks) {
+  if (!groupers.length) { return tasks; }
+  var grouped = qgroup(groupers[0], tasks);
+  grouped.children = grouped.children.map((g) => assign(g, {
+    children: nestGroups(groupers.slice(1), g.children),
+  }));
+  return grouped;
+}
+
+
+var query = Reflux.createStore({
+
+  listenables: actions.query,
+
+  onSet(newQuery) {
+    this.setData((tasks) => nestGroups(newQuery.group, tasks))
+  },
+
+  getInitialState() {
+    return (tasks) => nestGroups(['date'], tasks);
+  },
+
+});
+
+
 module.exports = {
   tasks: tasks,
   backups: backups,
   config: config,
+  query: query,
 };

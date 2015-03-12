@@ -40,6 +40,13 @@ var credits = {
           creator: 'Mira Bear',
           source: 'The Noun Project',
         },
+        {
+          id: 'swap',
+          url: 'http://thenounproject.com/term/movement/63536/',
+          name: 'Arrows',
+          creator: 'Zlatko Najdenovski',
+          source: 'The Noun Project',
+        },
       ],
     },
   ],
