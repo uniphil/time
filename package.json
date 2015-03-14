@@ -8,10 +8,12 @@
     "watchify": "^2.4.0"
   },
   "dependencies": {
+    "humanize-duration": "^2.4.0",
     "husl": "^5.0.2",
     "is-my-json-valid": "^2.9.4",
     "murmurhash-js": "^1.0.0",
     "object-assign": "^2.0.0",
+    "parse-duration": "^0.1.1",
     "react": "^0.12.2",
     "react-router": "^0.12.0",
     "reactify": "^1.0.0",

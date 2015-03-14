@@ -1,6 +1,7 @@
 var husl = require('husl');
 var React = require('react');
 var {Link} = require('react-router');
+var {duration} = require('../utils');
 var Task = require('./task.jsx');
 
 
@@ -73,7 +74,7 @@ var TaskList = React.createClass({
                     c.group}
               <small>
                 {' – '}
-                {sumTime(c)} mins
+                {duration.humanize(sumTime(c))}
               </small>
             </h3>
             <TaskList {...this.props} tasks={c.children} />

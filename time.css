@@ -91,7 +91,7 @@ input {
   padding: 0.5em 0.5em 0.5em 1em;
 }
 .task-duration {
-  width: 6em;
+  width: 4em;
 }
 .task-deleted .task-duration {
   text-decoration: line-through;

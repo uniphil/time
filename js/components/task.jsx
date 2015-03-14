@@ -5,6 +5,7 @@ var React = require('react');
 var {addons: {PureRenderMixin}} = require('react/addons');
 var {Link} = require('react-router');
 var Reflux = require('reflux');
+var {duration} = require('../utils');
 var actions = require('../actions');
 var {config} = require('../stores');
 var Icon = require('./icon.jsx');
@@ -89,7 +90,7 @@ var Task = React.createClass({
         tagsEl = this.refs.tags.getDOMNode();
 
     var task = {
-      duration: parseInt(durEl.value.trim(), 10),
+      duration: duration.parse(durEl.value.trim()),
       project: projEl.value.trim(),
       summary: sumEl.value.trim(),
       tags: ((t) => t && t.split(',').map((t) => t.trim()) || [])(tagsEl.value.trim()),
@@ -137,7 +138,7 @@ var Task = React.createClass({
           backgroundColor: husl.toHex(this.state.hue, 67, 95)}}
         onDoubleClick={this.edit}>
         <div className="task-duration">
-          <span className="task-duration-value">{this.props.duration}</span> mins
+          <span className="task-duration-value">{duration.humanize(this.props.duration)}</span>
         </div>
         <div className="task-project">
           <Link
@@ -193,8 +194,8 @@ var Task = React.createClass({
         style={{backgroundColor: husl.toHex(this.state.hue, 67, 95)}}
         onSubmit={this.commit}>
         {this.labeledInput('duration', 'Time', {
-          type: 'number',
-          defaultValue: this.props.duration || 10,
+          type: 'text',  // parsed string
+          defaultValue: duration.humanize(this.props.duration) || '1h',
           ref: 'dur'})}
         {this.labeledInput('project', 'Project', {
           type: 'text',
