@@ -196,18 +196,18 @@ var tasks = Reflux.createStore({
       if (log.action === 'create') {
         list.push(pick(['id', 'timestamp', 'duration', 'project', 'summary', 'tags'], log));
       } else if (log.action === 'update') {
-        findSpec({id: log.taskId}, list)({
+        findSpec({id: log.taskId}, list).match({
           Some: (task) => assign(task, log.update),
           None: () => console.error('could not find task', (log ? log.taskId : '???'),
                                     'to update to', log),
         });
       } else if (log.action === 'remove') {
-        findSpec({id: log.taskId}, list)({
+        findSpec({id: log.taskId}, list).match({
           Some: (task) => assign(task,  {removed: true}),
           None: () => console.error('could not find task', (log? log.taskId : '??'), 'to remove'),
         });
       } else if (log.action === 'unremove') {
-        findSpec({id: log.taskId}, list)({
+        findSpec({id: log.taskId}, list).match({
           Some: (task) => assign(task,  {removed: false}),
           None: () => console.error('could not find task', (log? log.taskId : '??'), 'to unremove'),
         });
