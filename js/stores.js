@@ -3,7 +3,6 @@ var shortid = require('shortid');
 var {Ok, Err} = require('results');
 var Reflux = require('reflux');
 var {pick, omit, findSpec} = require('./utils');
-var crud = require('./crud');
 var actions = require('./actions');
 
 
