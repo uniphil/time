@@ -6,44 +6,18 @@ var {pick, omit, findSpec} = require('./utils');
 var actions = require('./actions');
 
 
-var DataStoreMixin = {
-  init() {
-    this.data = this.getInitialState();
-  },
-  setData(newData) {
-    this.data = newData;
-    this.emit();
-    this.saveLocal && this.saveLocal();
-    return Ok(this.data);
-  },
-  emit() {
-    this.trigger(this.data);
-  },
-};
-
-
-function createLocalStore(key, empty, def) {
-  var store = Reflux.createStore(assign({}, {
-    mixins: [DataStoreMixin],
-    getInitialState() {
-      return JSON.parse(localStorage.getItem(key) || JSON.stringify(empty));
-    },
-    saveLocal() {
-      localStorage.setItem(key, JSON.stringify(this.data));
-    },
-  }, def));
-  window.addEventListener('storage', (e) => {
-    if (e.key === key) {
-      store.setData(JSON.parse(e.newValue)).unwrap();
-    }
-  });
-  return store;
-}
-
-
-var config = createLocalStore('config', {}, {
+var config = Reflux.createStore({
 
   listenables: actions.config,
+
+  init() {
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'config') {
+        store.setData(JSON.parse(e.newValue)).unwrap();
+      }
+    });
+    this.data = this.getInitialState();
+  },
 
   onSet(update) {
     this.setData(assign(this.data, update));
@@ -53,8 +27,26 @@ var config = createLocalStore('config', {}, {
     console.error('validating config change failed', why);
   },
 
-});
+  setData(newData) {
+    this.data = newData;
+    this.emit();
+    this.saveLocal && this.saveLocal();
+    return Ok(this.data);
+  },
 
+  saveLocal() {
+    localStorage.setItem('config', JSON.stringify(this.data));
+  },
+
+  emit() {
+    this.trigger(this.data);
+  },
+
+  getInitialState() {
+    return JSON.parse(localStorage.getItem('config') || JSON.stringify(empty));
+  },
+
+});
 
 
 var deviceId = Reflux.createStore({
