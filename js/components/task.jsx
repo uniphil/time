@@ -5,7 +5,7 @@ var React = require('react');
 var {addons: {PureRenderMixin}} = require('react/addons');
 var {Link} = require('react-router');
 var Reflux = require('reflux');
-var {duration} = require('../utils');
+var {pick, duration} = require('../utils');
 var actions = require('../actions');
 var {config} = require('../stores');
 var Icon = require('./icon.jsx');
@@ -98,29 +98,36 @@ var Task = React.createClass({
 
 
     if (this.props.mode === 'display') {
-      task.id = this.props.id;
-      task.timestamp = this.props.timestamp;
-      actions.tasks.update(this.props.id, task);
+      var picks = [];
+      if (task.duration !== this.props.duration) {
+        picks.push('duration');
+      }
+      if (task.project !== this.props.project) {
+        picks.push('project');
+      }
+      if (task.summary !== this.props.summary) {
+        picks.push('summary');
+      }
+      if (task.tags.length !== this.props.tags.length ||
+          task.tags.some((tag, i) => tag !== this.props.tags[i])) {
+        picks.push('tags');
+      }
+      picks.length && actions.tasks.ui.update(this.props.id, pick(picks, task));
       this.stopEdit();
     } else {
       task.timestamp = (new Date()).getTime();  // timestamp
-      actions.tasks.create(task);
+      actions.tasks.ui.create(task);
     }
   },
 
   remove(e) {
     e && e.preventDefault();
-    actions.tasks.remove(this.props.id);
-  },
-
-  reallyRemove(e) {
-    e && e.preventDefault();
-    actions.taskBackups.reallyRemove(this.props.id);
+    actions.tasks.ui.remove(this.props.id);
   },
 
   restore(e) {
     e && e.preventDefault();
-    actions.taskBackups.restore(this.props.id);
+    actions.tasks.ui.unremove(this.props.id);
   },
 
   typeProject(e) {
@@ -167,9 +174,6 @@ var Task = React.createClass({
           <div className="task-edit-buttons">
             <button className="button woo" onClick={this.restore} title="restore">
               restore
-            </button>{' '}
-            <button className="button caution" onClick={this.reallyRemove} title="delete">
-              delete
             </button>
           </div>
         )}
