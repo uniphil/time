@@ -193,7 +193,7 @@ var tasks = Reflux.createStore({
   processLogs(logs) {
     return logs.reduce((list, log) => {
       if (log.action === 'create') {
-        list.push(pick(['id', 'timestamp', 'duration', 'project', 'summary', 'tags'], log));
+        list.unshift(pick(['id', 'timestamp', 'duration', 'project', 'summary', 'tags'], log));
       } else if (log.action === 'update') {
         findSpec({id: log.taskId}, list).match({
           Some: (task) => assign(task, log.update),
