@@ -1,5 +1,7 @@
 var assign = require('object-assign');
+var shortid = require('shortid');
 var Reflux = require('reflux');
+var {pick} = require('./utils');
 // var validate = require('./validate');
 
 
@@ -24,7 +26,6 @@ tasks.ui = {};
 
 tasks.create = Reflux.createAction();
 tasks.ui.create = Reflux.createAction();
-// tasks.ui.create.listen((t) => console.log(t));
 // tasks.ui.create.validateWith(validate.newTask);
 
 tasks.update = Reflux.createAction();
@@ -50,6 +51,42 @@ config.localSync = Reflux.createAction();
 
 var query = {};
 query.set = Reflux.createAction();
+
+
+// ui => real actions
+var deviceId = (function(id) {
+  return {
+    get() { return id; },
+    generate() { return id + ':' + shortid.generate(); },
+  };
+})(localStorage.getItem('deviceId') || shortid.generate());
+
+
+tasks.ui.create.listen((task) => tasks.create(assign({
+  id: deviceId.generate(),
+  action: 'create',
+  timestamp: +new Date(),
+  removed: false,
+}, pick(['duration', 'project', 'summary', 'tags'], task))));
+
+tasks.ui.update.listen((id, update) => tasks.update({
+  id: deviceId.generate(),
+  action: 'update',
+  taskId: id,
+  update: update,
+}));
+
+tasks.ui.remove.listen((id) => tasks.remove({
+  id: deviceId.generate(),
+  action :'remove',
+  taskId: id,
+}));
+
+tasks.ui.unremove.listen((id) => tasks.remove({
+  id: deviceId.generate(),
+  action :'unremove',
+  taskId: id,
+}));
 
 
 module.exports = {

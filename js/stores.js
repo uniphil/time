@@ -1,8 +1,7 @@
 var assign = require('object-assign');
-var shortid = require('shortid');
 var {Ok, Err} = require('results');
 var Reflux = require('reflux');
-var {pick, omit, findSpec} = require('./utils');
+var {pick, findSpec} = require('./utils');
 var actions = require('./actions');
 
 
@@ -47,68 +46,6 @@ var config = Reflux.createStore({
   },
 
 });
-
-
-var deviceId = Reflux.createStore({
-  init() {
-    this.data = this.getInitialState();
-  },
-  getInitialState() {
-    if (localStorage.getItem('deviceId') === null) {
-      localStorage.setItem('deviceId', shortid.generate());
-    }
-    return localStorage.getItem('deviceId');
-  },
-  get() {
-    return this.data;
-  },
-  generate() {
-    return this.data + ':' + shortid.generate();
-  },
-});
-
-
-
-var uiTasksProcessor = Reflux.createStore({
-
-  listenables: actions.tasks.ui,
-
-  onCreate(task) {
-    actions.tasks.create(assign({
-      id: deviceId.generate(),
-      action: 'create',
-      timestamp: +new Date(),
-      removed: false,
-    }, pick(['duration', 'project', 'summary', 'tags'], task)));
-  },
-
-  onUpdate(id, update) {
-    actions.tasks.update({
-      id: deviceId.generate(),
-      action: 'update',
-      taskId: id,
-      update: update,
-    });
-  },
-
-  onRemove(id) {
-    actions.tasks.remove({
-      id: deviceId.generate(),
-      action :'remove',
-      taskId: id,
-    });
-  },
-
-  onUnremove(id) {
-    actions.tasks.remove({
-      id: deviceId.generate(),
-      action :'unremove',
-      taskId: id,
-    });
-  },
-
-});
-
 
 
 var taskActionLog = Reflux.createStore({
