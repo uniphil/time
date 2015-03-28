@@ -182,7 +182,8 @@ var tasks = Reflux.createStore({
   },
 
   setData(data, quiet) {
-    this.data = data;
+    // todo: use a default filter query instead
+    this.data = data.filter((t) => !t.removed);
     !quiet && this.emit();
   },
 
