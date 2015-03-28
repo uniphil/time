@@ -1,10 +1,12 @@
 var validator = require('is-my-json-valid');
 
-var task = validator({
+var newTask = validator({
   type: 'object',
   properties: {
-    id: {
+    id: { type: 'string' },
+    action: {
       type: 'string',
+      enum: ['create'],
     },
     timestamp: {
       description: 'datetime of task completion (implied by entry)',
@@ -16,21 +18,70 @@ var task = validator({
       type: 'integer',
       minimum: 0,
     },
-    summary: {
-      type: 'string',
-    },
-    project: {
-      type: 'string',
-    },
+    summary: { type: 'string' },
+    project: { type: 'string' },
     tags: {
       type: 'array',
-      items: {
-        type: 'string'
-      },
+      items: { type: 'string' },
       uniqueItems: true,
     },
   },
-  required: [ 'timestamp', 'duration', 'summary', 'tags' ],
+  required: [
+    'id',
+    'action',
+    'timestamp',
+    'duration',
+    'summary',
+    'tags'
+  ],
+});
+
+
+var updateTask = validator({
+  type: 'object',
+  properties: {
+    id: { type: 'string' },
+    action: {
+      type: 'string',
+      enum: ['update'],
+    },
+    update: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        updates: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              field: { type: 'string' },
+              set: {
+                type: {
+                  enum: [
+                    'string',
+                    'array',
+                  ],
+                },
+              },
+            },
+            required: [
+              'field',
+              'set',
+            ],
+          },
+        },
+        required: [
+          'id',
+          'updates',
+        ],
+      },
+    },
+  },
+  required: [
+    'id',
+    'action',
+    'update',
+  ],
 });
 
 
@@ -47,6 +98,9 @@ var config = validator({
 
 
 module.exports = {
-  task: task,
+  newTask: newTask,
+  updateTask: updateTask,
+  removeTask: removeTask,
+  unremoveTask: unremoveTask,
   config: config,
 };

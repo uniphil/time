@@ -1,47 +1,22 @@
 var assign = require('object-assign');
 var {Ok, Err} = require('results');
 var Reflux = require('reflux');
-var crud = require('./crud');
+var {pick, findSpec} = require('./utils');
 var actions = require('./actions');
 
 
-Reflux.StoreMethods = assign(Reflux.StoreMethods || {}, {
-  init() {
-    this.data = this.getInitialState();
-  },
-  setData(newData) {
-    this.data = newData;
-    this.emit();
-    this.saveLocal && this.saveLocal();
-    return Ok(this.data);
-  },
-  emit() {
-    this.trigger(this.data);
-  },
-});
-
-
-function createLocalStore(key, empty, def) {
-  var store = Reflux.createStore(assign({}, {
-    getInitialState() {
-      return JSON.parse(localStorage.getItem(key) || JSON.stringify(empty));
-    },
-    saveLocal() {
-      localStorage.setItem(key, JSON.stringify(this.data));
-    },
-  }, def));
-  window.addEventListener('storage', (e) => {
-    if (e.key === key) {
-      store.setData(JSON.parse(e.newValue)).unwrap();
-    }
-  });
-  return store;
-}
-
-
-var config = createLocalStore('config', {}, {
+var config = Reflux.createStore({
 
   listenables: actions.config,
+
+  init() {
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'config') {
+        store.setData(JSON.parse(e.newValue)).unwrap();
+      }
+    });
+    this.data = this.getInitialState();
+  },
 
   onSet(update) {
     this.setData(assign(this.data, update));
@@ -51,80 +26,126 @@ var config = createLocalStore('config', {}, {
     console.error('validating config change failed', why);
   },
 
+  setData(newData) {
+    this.data = newData;
+    this.emit();
+    this.saveLocal && this.saveLocal();
+    return Ok(this.data);
+  },
+
+  saveLocal() {
+    localStorage.setItem('config', JSON.stringify(this.data));
+  },
+
+  emit() {
+    this.trigger(this.data);
+  },
+
+  getInitialState() {
+    return JSON.parse(localStorage.getItem('config') || JSON.stringify(empty));
+  },
+
 });
 
 
-var tasks = createLocalStore('tasks', [], {
+var taskActionLog = Reflux.createStore({
 
   listenables: actions.tasks,
 
-  onCreate(newTask) {
-    newTask = assign({}, newTask, {
-      id: '' + (Math.max.apply(null, this.data.map((t) => (parseInt(t.id, 10) || 0)).concat(0)) + 1),
+  init() {
+    this.data = this.getInitialState();
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'taskActionLog') {
+        this.data = JSON.parse(e.newValue);
+        this.trigger(this.data);
+      }
     });
-    crud.create(this.data, newTask)
-      .andThen(this.setData.bind(this))
-      .unwrap();  // throw & log the err if anything failed
   },
 
-  onCreateFailedValidation(why) {
-    console.error('validating config change failed', why);
+  onCreate(newTask) {
+    this.pushLog(newTask);
   },
 
-  onUpdate(id, updated) {
-    crud.update(this.data, id, updated)
-      .andThen(this.setData.bind(this))
-      .unwrap();
+  onUpdate(update) {
+    this.pushLog(update);
   },
 
-  onRemove(id) {
-    crud.get(this.data, id)
-      .andThen((task) => Ok(actions.taskBackups.create(task)))
-      .andThen(() => crud.del(this.data, id))
-      .unwrap();
-    crud.del(this.data, id)
-      .andThen(this.setData.bind(this))
-      .unwrap();
+  onRemove(removal) {
+    this.pushLog(removal);
+  },
+
+  onUnremove(unremoval) {
+    this.pushLog(unremoval);
+  },
+
+  pushLog(log) {
+    this.data.push(log);
+    localStorage.setItem('taskActionLog', JSON.stringify(this.data));
+    this.trigger(this.data);
+  },
+
+  getInitialState() {
+    return JSON.parse(localStorage.getItem('taskActionLog') || '[]');
   },
 
 });
 
 
-var backups = createLocalStore('backups', [], {
+var tasks = Reflux.createStore({
 
-  listenables: actions.taskBackups,
-
-  onCreate(savedTask) {
-    savedTask = assign({}, savedTask, {
-      id: '' + (Math.max.apply(null, this.data.map((t) => (parseInt(t.id, 10) || 0)).concat(0)) + 1),
-      deleted: true,
-    });
-    crud.create(this.data, savedTask)
-      .andThen(this.setData.bind(this))
-      .unwrap();  // throw & log the err if anything failed
+  init() {
+    this.listenTo(taskActionLog, this.updateLog, this.initLog);
   },
 
-  onCreateFailedValidation(why) {
-    console.error('validating config change failed', why);
+  initLog(initialLogs) {
+    this.setData(this.processLogs(initialLogs), true);
   },
 
-  onRestore(id) {
-    crud.get(this.data, id)
-      .andThen((task) => {
-        task = assign({}, task);
-        delete task.deleted;
-        return Ok(actions.tasks.create(task))
-      })  // todo fail and bail if err
-      .andThen(() => crud.del(this.data, id)
-        .andThen(this.setData.bind(this)))
-      .unwrap();
+  getInitialState() {
+    if (this.data === undefined) { throw new Error('uninitialized tasks :('); }
+    return this.data;
   },
 
-  onReallyRemove(id) {
-    crud.del(this.data, id)
-      .andThen(this.setData.bind(this))
-      .unwrap();
+  updateLog(newLogs) {
+    this.setData(this.processLogs(newLogs));
   },
+
+  setData(data, quiet) {
+    // todo: use a default filter query instead
+    this.data = data.filter((t) => !t.removed);
+    !quiet && this.emit();
+  },
+
+  emit() {
+    this.trigger(this.data);
+  },
+
+  processLogs(logs) {
+    return logs.reduce((list, log) => {
+      if (log.action === 'create') {
+        list.unshift(pick(['id', 'timestamp', 'duration', 'project', 'summary', 'tags'], log));
+      } else if (log.action === 'update') {
+        findSpec({id: log.taskId}, list).match({
+          Some: (task) => assign(task, log.update),
+          None: () => console.error('could not find task', (log ? log.taskId : '???'),
+                                    'to update to', log),
+        });
+      } else if (log.action === 'remove') {
+        findSpec({id: log.taskId}, list).match({
+          Some: (task) => assign(task,  {removed: true}),
+          None: () => console.error('could not find task', (log? log.taskId : '??'), 'to remove'),
+        });
+      } else if (log.action === 'unremove') {
+        findSpec({id: log.taskId}, list).match({
+          Some: (task) => assign(task,  {removed: false}),
+          None: () => console.error('could not find task', (log? log.taskId : '??'), 'to unremove'),
+        });
+      } else {
+        console.error('cannot process action', log ? log.action : '??', 'for log', log);
+      }
+      return list;
+    }, []);
+  }
 
 });
 
@@ -178,8 +199,21 @@ var query = Reflux.createStore({
 
   listenables: actions.query,
 
+  init() {
+    this.data = this.getInitialState();
+  },
+
   onSet(newQuery) {
     this.setData((tasks) => nestGroups(newQuery.group, tasks))
+  },
+
+  setData(data) {
+    this.data = data;
+    this.emit();
+  },
+
+  emit() {
+    this.trigger(this.data);
   },
 
   getInitialState() {
@@ -191,7 +225,6 @@ var query = Reflux.createStore({
 
 module.exports = {
   tasks: tasks,
-  backups: backups,
   config: config,
   query: query,
 };
