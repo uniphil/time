@@ -42,7 +42,7 @@ var config = Reflux.createStore({
   },
 
   getInitialState() {
-    return JSON.parse(localStorage.getItem('config') || JSON.stringify(empty));
+    return JSON.parse(localStorage.getItem('config') || JSON.stringify({}));
   },
 
 });
