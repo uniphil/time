@@ -6,7 +6,7 @@ var React = require('react');
 var {addons: {PureRenderMixin}} = require('react/addons');
 var {Link} = require('react-router');
 var Reflux = require('reflux');
-var {pick, duration} = require('../utils');
+var {duration} = require('../utils');
 var actions = require('../actions');
 var {config} = require('../stores');
 var Icon = require('./icon.jsx');
@@ -99,21 +99,8 @@ var Task = React.createClass({
 
 
     if (this.props.mode === 'display') {
-      var picks = [];
-      if (task.duration !== this.props.duration) {
-        picks.push('duration');
-      }
-      if (task.project !== this.props.project) {
-        picks.push('project');
-      }
-      if (task.summary !== this.props.summary) {
-        picks.push('summary');
-      }
-      if (task.tags.length !== this.props.tags.length ||
-          task.tags.some((tag, i) => tag !== this.props.tags[i])) {
-        picks.push('tags');
-      }
-      picks.length && actions.tasks.ui.update(this.props.id, pick(picks, task));
+      task.id = this.props.id;
+      actions.tasks.ui.update(this.props, task);
       this.stopEdit();
     } else {
       task.timestamp = (new Date()).getTime();  // timestamp

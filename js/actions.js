@@ -70,12 +70,32 @@ tasks.ui.create.listen((task) => tasks.create(assign({
   removed: false,
 }, pick(['duration', 'project', 'summary', 'tags'], task))));
 
-tasks.ui.update.listen((id, update) => tasks.update({
-  id: deviceId.generate(),
-  action: 'update',
-  taskId: id,
-  update: update,
-}));
+tasks.ui.update.listen((oldTask, newTask) => {
+  if (oldTask.id !== newTask.id) {
+    throw new Error('Task update with different task ids');
+  }
+  var picks = [];
+  if (newTask.duration !== oldTask.duration) {
+    picks.push('duration');
+  }
+  if (newTask.project !== oldTask.project) {
+    picks.push('project');
+  }
+  if (newTask.summary !== oldTask.summary) {
+    picks.push('summary');
+  }
+  if (newTask.tags.length !== oldTask.tags.length ||
+      newTask.tags.some((tag, i) => tag !== oldTask.tags[i])) {
+    picks.push('tags');
+  }
+  var update = pick(picks, newTask);
+  tasks.update({
+    id: deviceId.generate(),
+    action: 'update',
+    taskId: oldTask.id,
+    update: update,
+  });
+});
 
 tasks.ui.remove.listen((id) => tasks.remove({
   id: deviceId.generate(),
