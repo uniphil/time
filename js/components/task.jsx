@@ -86,8 +86,8 @@ var Task = React.createClass({
   commit(e) {
     e && e.preventDefault();
     var durEl = this.refs.dur.getDOMNode(),
-        projEl = this.refs.project.getDOMNode();
-        sumEl = this.refs.summary.getDOMNode();
+        projEl = this.refs.project.getDOMNode(),
+        sumEl = this.refs.summary.getDOMNode(),
         tagsEl = this.refs.tags.getDOMNode();
 
     var task = {
