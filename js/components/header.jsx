@@ -1,3 +1,4 @@
+'use strict';
 var murmur = require('murmurhash-js/murmurhash3_gc');
 var husl = require('husl');
 var React = require('react/addons');

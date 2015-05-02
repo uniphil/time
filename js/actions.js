@@ -1,3 +1,4 @@
+'use strict';
 var assign = require('object-assign');
 var shortid = require('shortid');
 var Reflux = require('reflux');

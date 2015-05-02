@@ -1,3 +1,4 @@
+'use strict';
 var husl = require('husl');
 var React = require('react');
 var {Link} = require('react-router');

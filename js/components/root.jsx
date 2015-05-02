@@ -1,3 +1,4 @@
+'use strict';
 var React = require('react');
 var Reflux = require('reflux');
 var {RouteHandler} = require('react-router');

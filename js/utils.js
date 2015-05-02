@@ -1,3 +1,4 @@
+'use strict';
 var parseDuration = require('parse-duration');
 var humanizeDuration = require('humanize-duration');
 var {Some, None} = require('results');

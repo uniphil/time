@@ -1,3 +1,4 @@
+'use strict';
 var assign = require('object-assign');
 var {Ok, Err} = require('results');
 var Reflux = require('reflux');

@@ -1,3 +1,4 @@
+'use strict';
 var React = require('react');
 var {addons: {PureRenderMixin}} = require('react/addons');
 var Icon = require('./icon.jsx');

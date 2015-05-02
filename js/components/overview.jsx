@@ -1,3 +1,4 @@
+'use strict';
 var React = require('react');
 var {addons: {update, PureRenderMixin}} = require('react/addons');
 var TaskList = require('./task-list.jsx');

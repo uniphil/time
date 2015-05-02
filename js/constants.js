@@ -1,3 +1,5 @@
+'use strict';
+
 var $;  // dummy
 
 module.exports=((s)=>Object.keys(s).reduce((o,k)=>{o[k]={c:k};return o;},{}))

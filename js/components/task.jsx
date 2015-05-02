@@ -1,3 +1,4 @@
+'use strict';
 var assign = require('object-assign');
 var murmur = require('murmurhash-js/murmurhash3_gc');
 var husl = require('husl');

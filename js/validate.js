@@ -1,3 +1,4 @@
+'use strict';
 var validator = require('is-my-json-valid');
 
 var newTask = validator({
